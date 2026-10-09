@@ -32,6 +32,12 @@ internal class SSLCustomSNIHostnamePreference(context: Context, attrs: Attribute
     override val preferenceTitle = "Custom SNI Hostname"
 }
 
+internal class SSLCamouflageSecretPreference(context: Context, attrs: AttributeSet) : StringPreference(context, attrs) {
+    override val oscPrefKey = OscPrefKey.SSL_CAMOUFLAGE_SECRET
+    override val parentKey: OscPrefKey? = null
+    override val preferenceTitle = "Camouflage Secret (Keenetic, optional)"
+}
+
 internal class PPPStaticIPv4AddressPreference(context: Context, attrs: AttributeSet) : StringPreference(context, attrs) {
     override val oscPrefKey = OscPrefKey.PPP_STATIC_IPv4_ADDRESS
     override val preferenceTitle = "Static IPv4 Address"

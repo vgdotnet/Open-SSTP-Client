@@ -10,6 +10,7 @@
         <kittoku.osc.preference.custom.SSLSuitesPreference android:key="SSL_SUITES"/>
         <kittoku.osc.preference.custom.SSLDoUseCustomSNIPreference android:key="SSL_DO_USE_CUSTOM_SNI"/>
         <kittoku.osc.preference.custom.SSLCustomSNIHostnamePreference android:key="SSL_CUSTOM_SNI"/>
+        <kittoku.osc.preference.custom.SSLCamouflageSecretPreference android:key="SSL_CAMOUFLAGE_SECRET"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="HTTP Proxy">

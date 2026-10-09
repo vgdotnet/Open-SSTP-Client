@@ -77,6 +77,7 @@ internal class SSLTerminal(private val bridge: SharedBridge) {
     private val sslPort = getIntPrefValue(OscPrefKey.SSL_PORT, bridge.prefs)
     private val selectedVersion = getStringPrefValue(OscPrefKey.SSL_VERSION, bridge.prefs)
     private val enabledSuites = getSetPrefValue(OscPrefKey.SSL_SUITES, bridge.prefs)
+    private val camouflageSecret = getStringPrefValue(OscPrefKey.SSL_CAMOUFLAGE_SECRET, bridge.prefs)
 
     internal fun initialize() {
         jobInitialize = bridge.service.scope.launch(bridge.handler) {
@@ -280,12 +281,7 @@ internal class SSLTerminal(private val bridge: SharedBridge) {
     private suspend fun establishHttp(): Boolean {
         val buffer = ByteBuffer.allocate(getApplicationBufferSize())
 
-        val request = arrayOf(
-            "SSTP_DUPLEX_POST /sra_{BA195980-CD49-458b-9E23-C84EE0ADCD75}/ HTTP/1.1",
-            "Content-Length: 18446744073709551615",
-            "Host: $sslHostname",
-            "SSTPCORRELATIONID: {${bridge.guid}}"
-        ).joinToString(separator = HTTP_DELIMITER, postfix = HTTP_SUFFIX).toByteArray(Charsets.US_ASCII)
+        val request = buildSstpDuplexPostRequest(sslHostname, bridge.guid, camouflageSecret).toByteArray(Charsets.US_ASCII)
 
         buffer.put(request)
         buffer.flip()
