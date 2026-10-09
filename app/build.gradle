@@ -23,6 +23,12 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            resValue "string", "app_name", "Open SSTP Client"
+        }
+        debug {
+            // separate package so the debug build can live next to the Play Store release
+            applicationIdSuffix ".dev"
+            resValue "string", "app_name", "OSC dev"
         }
     }
 

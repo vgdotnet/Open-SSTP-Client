@@ -8,3 +8,4 @@
 /local.properties
 /playground
 /releases
+.secret/
