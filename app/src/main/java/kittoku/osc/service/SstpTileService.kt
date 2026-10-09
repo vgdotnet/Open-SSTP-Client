@@ -1,5 +1,6 @@
 package kittoku.osc.service
 
+import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Intent
 import android.content.SharedPreferences
@@ -11,7 +12,8 @@ import androidx.annotation.RequiresApi
 import androidx.preference.PreferenceManager
 import kittoku.osc.preference.OscPrefKey
 import kittoku.osc.preference.accessor.getBooleanPrefValue
-import kittoku.osc.preference.checkPreferences
+import kittoku.osc.preference.connectionReadiness
+import kittoku.osc.ui.AppActivity
 
 
 @RequiresApi(Build.VERSION_CODES.N)
@@ -34,10 +36,6 @@ internal class SstpTileService : TileService() {
     private val isVpnPrepared: Boolean
         get() = VpnService.prepare(this) == null
 
-    private fun invalidateTileState() {
-        qsTile.state = Tile.STATE_UNAVAILABLE
-        qsTile.updateTile()
-    }
 
     private fun updateTileState() {
         qsTile.state = if (rootState) {
@@ -59,12 +57,9 @@ internal class SstpTileService : TileService() {
         qsTile.updateTile()
     }
 
+    // an unavailable tile cannot be clicked, so the app could never be opened from it to grant the VPN permission
     private fun initializeState() {
-        if (isVpnPrepared) {
-            updateTileState()
-        } else {
-            invalidateTileState()
-        }
+        updateTileState()
     }
 
     override fun onTileAdded() {
@@ -91,8 +86,22 @@ internal class SstpTileService : TileService() {
         }
     }
 
+    private fun openApp() {
+        val intent = Intent(this, AppActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startActivityAndCollapse(PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE))
+        } else {
+            @Suppress("DEPRECATION")
+            startActivityAndCollapse(intent)
+        }
+    }
+
     override fun onClick() {
-        if (!isVpnPrepared || checkPreferences(prefs) != null) return
+        if (!rootState && (!isVpnPrepared || connectionReadiness(prefs) != null)) {
+            openApp()
+            return
+        }
 
         flipTileState()
 

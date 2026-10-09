@@ -28,8 +28,7 @@
 
         <activity
             android:exported="true"
-            android:name=".ui.AppActivity"
-            android:theme="@style/Theme.OpenSSTPClient.Compose">
+            android:name=".ui.AppActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -41,12 +40,8 @@
 
         <activity
             android:exported="false"
-            android:name=".activity.MainActivity">
-        </activity>
-
-        <activity
-            android:exported="false"
-            android:name=".activity.BlankActivity">
+            android:name=".activity.BlankActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
         </activity>
 
         <service

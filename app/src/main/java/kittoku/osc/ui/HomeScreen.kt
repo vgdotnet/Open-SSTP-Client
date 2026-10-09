@@ -61,6 +61,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kittoku.osc.R
+import kittoku.osc.preference.ReadinessError
 import kotlinx.coroutines.delay
 
 
@@ -68,11 +69,11 @@ import kotlinx.coroutines.delay
 @Composable
 internal fun HomeScreen(
     uiState: HomeUiState,
-    onConnect: () -> String?,
+    onConnect: () -> ReadinessError?,
     onDisconnect: () -> Unit,
     onOpenDetails: () -> Unit,
     onOpenLog: () -> Unit,
-    onOpenLegacySettings: () -> Unit,
+    onOpenAbout: () -> Unit,
     onSelectProfile: (String) -> Unit,
     onManageProfiles: () -> Unit,
     onCreateProfile: () -> Unit,
@@ -82,7 +83,7 @@ internal fun HomeScreen(
 
     val vpnPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            onConnect()?.also { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
+            onConnect()?.also { Toast.makeText(context, it.messageRes(), Toast.LENGTH_LONG).show() }
         }
     }
 
@@ -91,7 +92,7 @@ internal fun HomeScreen(
         if (prepareIntent != null) {
             vpnPermissionLauncher.launch(prepareIntent)
         } else {
-            onConnect()?.also { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
+            onConnect()?.also { Toast.makeText(context, it.messageRes(), Toast.LENGTH_LONG).show() }
         }
     }
 
@@ -105,10 +106,10 @@ internal fun HomeScreen(
                     }
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(R.string.menu_legacy_settings)) },
+                            text = { Text(stringResource(R.string.menu_about)) },
                             onClick = {
                                 menuExpanded = false
-                                onOpenLegacySettings()
+                                onOpenAbout()
                             },
                         )
                     }
@@ -436,4 +437,9 @@ private fun MainButton(state: ConnectionState, onConnect: () -> Unit, onDisconne
             Text(stringResource(R.string.action_disconnect))
         }
     }
+}
+
+private fun ReadinessError.messageRes() = when (this) {
+    ReadinessError.NO_SERVER -> R.string.readiness_no_server
+    ReadinessError.INVALID_SETTINGS -> R.string.readiness_invalid
 }

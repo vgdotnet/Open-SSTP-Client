@@ -57,7 +57,7 @@ class ProfileSettingsTest {
 
     @Test
     fun proxyChecksItsOwnHostname() {
-        // the legacy checkPreferences() looked at HOME_HOSTNAME here and let an empty proxy host through
+        // the original settings check looked at HOME_HOSTNAME here and let an empty proxy host through
         assertEquals(setOf(SettingsError.PROXY_HOST_EMPTY), errorsOf {
             setBoolean(OscPrefKey.PROXY_DO_USE_PROXY, true)
             setString(OscPrefKey.HOME_HOSTNAME, "vpn.example.com")

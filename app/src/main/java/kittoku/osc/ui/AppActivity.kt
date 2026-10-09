@@ -1,7 +1,6 @@
 package kittoku.osc.ui
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -16,7 +15,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import kittoku.osc.activity.MainActivity
 import kittoku.osc.control.ConnectionLog
 import kittoku.osc.preference.Profile
 import kittoku.osc.preference.SettingsError
@@ -28,6 +26,7 @@ import kittoku.osc.ui.theme.OscTheme
 private const val ROUTE_HOME = "home"
 private const val ROUTE_DETAILS = "details"
 private const val ROUTE_LOG = "log"
+private const val ROUTE_ABOUT = "about"
 private const val ROUTE_PROFILES = "profiles"
 private const val ROUTE_EDIT = "edit"
 private const val ROUTE_EDIT_ROUTES = "edit/routes"
@@ -47,8 +46,6 @@ class AppActivity : ComponentActivity() {
                 requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
             }
         }
-
-        val openLegacySettings = { startActivity(Intent(this, MainActivity::class.java)) }
 
         setContent {
             OscTheme {
@@ -73,7 +70,7 @@ class AppActivity : ComponentActivity() {
                             onDisconnect = homeViewModel::disconnect,
                             onOpenDetails = { navController.navigate(ROUTE_DETAILS) },
                             onOpenLog = { navController.navigate(ROUTE_LOG) },
-                            onOpenLegacySettings = openLegacySettings,
+                            onOpenAbout = { navController.navigate(ROUTE_ABOUT) },
                             onSelectProfile = { profilesViewModel.activate(it) },
                             onManageProfiles = { navController.navigate(ROUTE_PROFILES) },
                             onCreateProfile = { openEditor(null) },
@@ -84,6 +81,9 @@ class AppActivity : ComponentActivity() {
                     }
                     composable(ROUTE_LOG) {
                         LogScreen(lines = logLines, onBack = popBack)
+                    }
+                    composable(ROUTE_ABOUT) {
+                        AboutScreen(onBack = popBack)
                     }
                     composable(ROUTE_PROFILES) {
                         ProfilesScreen(

@@ -1,7 +1,6 @@
 <resources>
     <string name="home_title">Open SSTP Client</string>
     <string name="menu_more">Ещё</string>
-    <string name="menu_legacy_settings">Старые настройки</string>
 
     <string name="state_disconnected">Отключено</string>
     <string name="state_connecting">Подключение…</string>
@@ -188,4 +187,21 @@
     <string name="log_copy">Копировать</string>
     <string name="log_copied">Журнал скопирован</string>
     <string name="log_share">Поделиться</string>
+
+    <string name="menu_about">О приложении</string>
+    <string name="about_title">О приложении</string>
+    <string name="about_version">Версия %1$s</string>
+    <string name="about_text">Форк Open SSTP Client с новым интерфейсом.</string>
+    <string name="about_fork">Исходный код этой версии</string>
+    <string name="about_upstream">Оригинальный проект</string>
+    <string name="about_license">Лицензия</string>
+    <string name="about_license_text">MIT</string>
+    <string name="readiness_no_server">Укажите сервер в настройках подключения</string>
+    <string name="readiness_invalid">В настройках подключения есть ошибки. Откройте подключение и сохраните его, чтобы их увидеть.</string>
+    <string name="cert_saved">Сертификат сохранён</string>
+    <string name="cert_save_failed">Не удалось сохранить сертификат</string>
+    <string name="about_thanks">Благодарности</string>
+    <string name="about_thanks_text">Это приложение существует благодаря KOBAYASHI Ittoku, который написал Open SSTP Client и открыл его код под лицензией MIT. Всё, на чём держится подключение, SSTP, PPP, TLS и аутентификация, — его работа. Эта версия только добавляет поверх неё новый интерфейс.</string>
+    <string name="about_contributors">Участники оригинального проекта</string>
+    <string name="about_links">Ссылки</string>
 </resources>

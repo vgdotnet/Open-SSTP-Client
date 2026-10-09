@@ -1,54 +1,44 @@
 package kittoku.osc.activity
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import kittoku.osc.R
-import kittoku.osc.databinding.ActivityBlankBinding
-import kittoku.osc.fragment.AppsFragment
-import kittoku.osc.fragment.ProfilesFragment
-import kittoku.osc.fragment.SaveCertFragment
 
 
-internal const val BLANK_ACTIVITY_TYPE_PROFILES = 0
-internal const val BLANK_ACTIVITY_TYPE_APPS = 1
 internal const val BLANK_ACTIVITY_TYPE_SAVE_CERT = 2
 
 internal const val EXTRA_KEY_TYPE = "TYPE"
 internal const val EXTRA_KEY_CERT = "CERT"
 internal const val EXTRA_KEY_FILENAME = "FILENAME"
 
-class BlankActivity : AppCompatActivity() {
+// Opened from SSLTerminal's "untrusted certificate" notification; name and extras are kept so the core stays untouched
+class BlankActivity : ComponentActivity() {
+    private val saveLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/x-x509-ca-cert")) { uri ->
+        val cert = intent.getByteArrayExtra(EXTRA_KEY_CERT)
+
+        if (uri != null && cert != null) {
+            val saved = runCatching {
+                contentResolver.openOutputStream(uri, "w")?.use { it.write(cert) } != null
+            }.getOrDefault(false)
+
+            Toast.makeText(this, if (saved) R.string.cert_saved else R.string.cert_save_failed, Toast.LENGTH_SHORT).show()
+        }
+
+        finish()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val fragment: Fragment
-
-        when (intent.extras!!.getInt(EXTRA_KEY_TYPE)) {
-            BLANK_ACTIVITY_TYPE_PROFILES -> {
-                title = "Profiles"
-                fragment = ProfilesFragment()
-            }
-
-            BLANK_ACTIVITY_TYPE_APPS -> {
-                title = "Allowed/Disallowed Apps"
-                fragment = AppsFragment()
-            }
-
-            BLANK_ACTIVITY_TYPE_SAVE_CERT -> {
-                fragment = SaveCertFragment(intent)
-            }
-
-            else -> throw NotImplementedError(intent.toString())
+        if (intent.getIntExtra(EXTRA_KEY_TYPE, -1) != BLANK_ACTIVITY_TYPE_SAVE_CERT || intent.getByteArrayExtra(EXTRA_KEY_CERT) == null) {
+            finish()
+            return
         }
 
-        val binding = ActivityBlankBinding.inflate(layoutInflater)
-        binding.root.fitsSystemWindows = true
-        setContentView(binding.root)
-
-        supportFragmentManager.beginTransaction().also {
-            it.replace(R.id.blank, fragment)
-            it.commit()
+        if (savedInstanceState == null) {
+            saveLauncher.launch(intent.getStringExtra(EXTRA_KEY_FILENAME) ?: "server.crt")
         }
     }
 }
