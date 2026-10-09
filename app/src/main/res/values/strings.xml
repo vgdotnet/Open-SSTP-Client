@@ -1,5 +1,49 @@
 <resources>
     <string name="home_title">Open SSTP Client</string>
-    <string name="home_placeholder">New interface is under construction</string>
-    <string name="home_open_legacy">Open legacy settings</string>
+    <string name="menu_more">More</string>
+    <string name="menu_legacy_settings">Legacy settings</string>
+    <string name="profile_none">No connection configured</string>
+
+    <string name="state_disconnected">Disconnected</string>
+    <string name="state_connecting">Connecting…</string>
+    <string name="state_connected">Connected</string>
+    <string name="state_error">Error</string>
+
+    <string name="action_connect">Connect</string>
+    <string name="action_disconnect">Disconnect</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_back">Back</string>
+    <string name="link_details">Details</string>
+
+    <string name="details_title">Connection details</string>
+    <string name="details_empty">No connection established</string>
+    <string name="details_tls">TLS</string>
+    <string name="details_address">Address</string>
+    <string name="details_dns">DNS</string>
+    <string name="details_route">Route</string>
+    <string name="details_apps">Apps</string>
+    <string name="details_route_all">all traffic</string>
+    <string name="details_route_custom">custom (%1$d)</string>
+    <string name="details_apps_all">all</string>
+    <string name="details_none">not specified</string>
+
+    <string name="error_credentials_title">Wrong username or password</string>
+    <string name="error_credentials_hint">The server rejected the credentials. Check the username and password.</string>
+    <string name="error_auth_protocol_title">Authentication method rejected</string>
+    <string name="error_auth_protocol_hint">The server does not accept any of the selected authentication protocols.</string>
+    <string name="error_certificate_title">Server certificate not trusted</string>
+    <string name="error_certificate_hint">The certificate chain or the hostname could not be verified. Check the hostname or add the certificate as trusted.</string>
+    <string name="error_unreachable_title">Server not reachable</string>
+    <string name="error_unreachable_hint">No TLS response from the server. Check the hostname, the port and your network.</string>
+    <string name="error_not_sstp_title">Not an SSTP server</string>
+    <string name="error_not_sstp_hint">The server answered, but not with SSTP. Check the port and the server settings.</string>
+    <string name="error_proxy_title">Proxy error</string>
+    <string name="error_proxy_hint">The HTTP proxy refused the connection. Check the proxy settings.</string>
+    <string name="error_server_closed_title">Disconnected by the server</string>
+    <string name="error_server_closed_hint">The server closed the connection.</string>
+    <string name="error_timeout_title">Connection lost</string>
+    <string name="error_timeout_hint">The server stopped responding.</string>
+    <string name="error_unknown_title">Connection failed</string>
+    <string name="error_unknown_hint">See the log for details.</string>
 </resources>

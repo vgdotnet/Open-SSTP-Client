@@ -52,6 +52,9 @@ internal enum class OscPrefKey {
     RECONNECTION_LIFE,
     LOG_DO_SAVE_LOG,
     LOG_DIR,
+    CONNECTION_STATE,
+    CONNECTED_SINCE,
+    LAST_ERROR,
 }
 
 
@@ -92,6 +95,11 @@ private const val EMPTY_TEXT = ""
 internal const val LIST_TYPE_ALLOWED = "Allowed Apps"
 internal const val LIST_TYPE_DISALLOWED = "Disallowed Apps"
 
+internal const val CONNECTION_STATE_DISCONNECTED = "DISCONNECTED"
+internal const val CONNECTION_STATE_CONNECTING = "CONNECTING"
+internal const val CONNECTION_STATE_CONNECTED = "CONNECTED"
+internal const val CONNECTION_STATE_ERROR = "ERROR"
+
 internal val DEFAULT_STRING_MAP = mapOf(
     OscPrefKey.HOME_HOSTNAME to EMPTY_TEXT,
     OscPrefKey.HOME_USERNAME to EMPTY_TEXT,
@@ -107,6 +115,9 @@ internal val DEFAULT_STRING_MAP = mapOf(
     OscPrefKey.DNS_CUSTOM_ADDRESS to EMPTY_TEXT,
     OscPrefKey.ROUTE_CUSTOM_ROUTES to EMPTY_TEXT,
     OscPrefKey.ROUTE_APP_LIST_TYPE to LIST_TYPE_ALLOWED,
+    OscPrefKey.CONNECTION_STATE to CONNECTION_STATE_DISCONNECTED,
+    OscPrefKey.CONNECTED_SINCE to EMPTY_TEXT,
+    OscPrefKey.LAST_ERROR to EMPTY_TEXT,
 )
 
 private val EMPTY_SET = setOf<String>()

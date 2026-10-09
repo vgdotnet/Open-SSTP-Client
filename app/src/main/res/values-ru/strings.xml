@@ -1,5 +1,49 @@
 <resources>
     <string name="home_title">Open SSTP Client</string>
-    <string name="home_placeholder">Новый интерфейс в разработке</string>
-    <string name="home_open_legacy">Открыть старые настройки</string>
+    <string name="menu_more">Ещё</string>
+    <string name="menu_legacy_settings">Старые настройки</string>
+    <string name="profile_none">Подключение не настроено</string>
+
+    <string name="state_disconnected">Отключено</string>
+    <string name="state_connecting">Подключение…</string>
+    <string name="state_connected">Подключено</string>
+    <string name="state_error">Ошибка</string>
+
+    <string name="action_connect">Подключить</string>
+    <string name="action_disconnect">Отключить</string>
+    <string name="action_retry">Повторить</string>
+    <string name="action_cancel">Отмена</string>
+    <string name="action_back">Назад</string>
+    <string name="link_details">Подробности</string>
+
+    <string name="details_title">Сведения о подключении</string>
+    <string name="details_empty">Подключение не установлено</string>
+    <string name="details_tls">TLS</string>
+    <string name="details_address">Адрес</string>
+    <string name="details_dns">DNS</string>
+    <string name="details_route">Маршрут</string>
+    <string name="details_apps">Приложения</string>
+    <string name="details_route_all">весь трафик</string>
+    <string name="details_route_custom">выборочно (%1$d)</string>
+    <string name="details_apps_all">все</string>
+    <string name="details_none">не задано</string>
+
+    <string name="error_credentials_title">Неверный логин или пароль</string>
+    <string name="error_credentials_hint">Сервер отклонил учётные данные. Проверьте имя пользователя и пароль.</string>
+    <string name="error_auth_protocol_title">Способ аутентификации отклонён</string>
+    <string name="error_auth_protocol_hint">Сервер не принимает ни один из выбранных протоколов аутентификации.</string>
+    <string name="error_certificate_title">Сертификат сервера не доверенный</string>
+    <string name="error_certificate_hint">Не удалось проверить цепочку сертификатов или имя хоста. Проверьте имя сервера или добавьте сертификат в доверенные.</string>
+    <string name="error_unreachable_title">Сервер недоступен</string>
+    <string name="error_unreachable_hint">Нет ответа TLS от сервера. Проверьте имя сервера, порт и сеть.</string>
+    <string name="error_not_sstp_title">Это не SSTP-сервер</string>
+    <string name="error_not_sstp_hint">Сервер ответил, но не по SSTP. Проверьте порт и настройки сервера.</string>
+    <string name="error_proxy_title">Ошибка прокси</string>
+    <string name="error_proxy_hint">HTTP-прокси отклонил подключение. Проверьте настройки прокси.</string>
+    <string name="error_server_closed_title">Сервер разорвал соединение</string>
+    <string name="error_server_closed_hint">Сервер закрыл подключение.</string>
+    <string name="error_timeout_title">Соединение потеряно</string>
+    <string name="error_timeout_hint">Сервер перестал отвечать.</string>
+    <string name="error_unknown_title">Не удалось подключиться</string>
+    <string name="error_unknown_hint">Подробности в журнале.</string>
 </resources>

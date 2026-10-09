@@ -25,6 +25,9 @@ import kittoku.osc.preference.OscPrefKey
 import kittoku.osc.preference.accessor.getBooleanPrefValue
 import kittoku.osc.preference.accessor.getIntPrefValue
 import kittoku.osc.preference.accessor.getURIPrefValue
+import kittoku.osc.preference.accessor.markConnecting
+import kittoku.osc.preference.accessor.markDisconnected
+import kittoku.osc.preference.accessor.markDisconnectedUnlessError
 import kittoku.osc.preference.accessor.resetReconnectionLife
 import kittoku.osc.preference.accessor.setBooleanPrefValue
 import kittoku.osc.preference.accessor.setIntPrefValue
@@ -106,6 +109,7 @@ internal class SstpVpnService : VpnService() {
 
                 beForegrounded()
                 resetReconnectionLife(prefs)
+                markConnecting(prefs)
                 if (getBooleanPrefValue(OscPrefKey.LOG_DO_SAVE_LOG, prefs)) {
                     prepareLogWriter()
                 }
@@ -123,6 +127,7 @@ internal class SstpVpnService : VpnService() {
                 // ensure that reconnection has been completely canceled or done
                 runBlocking { jobReconnect?.cancelAndJoin() }
 
+                markDisconnected(prefs)
                 controller?.disconnect()
                 controller = null
 
@@ -184,6 +189,7 @@ internal class SstpVpnService : VpnService() {
 
                 delay(getIntPrefValue(OscPrefKey.RECONNECTION_INTERVAL, prefs) * 1000L)
 
+                markConnecting(prefs)
                 initializeClient()
             } catch (_: CancellationException) { }
             finally {
@@ -269,6 +275,7 @@ internal class SstpVpnService : VpnService() {
         scope.cancel()
 
         setRootState(false)
+        markDisconnectedUnlessError(prefs)
         prefs.unregisterOnSharedPreferenceChangeListener(listener)
     }
 }
