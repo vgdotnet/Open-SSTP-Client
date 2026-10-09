@@ -56,6 +56,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          apk="${{ github.event.repository.name }}-${GITHUB_REF_NAME}.apk"
+          apk="Homeward-${GITHUB_REF_NAME}.apk"
           cp app/build/outputs/apk/release/app-release.apk "$apk"
           gh release create "$GITHUB_REF_NAME" "$apk" --verify-tag --generate-notes
