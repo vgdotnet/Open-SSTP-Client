@@ -32,8 +32,8 @@ android {
         applicationId "io.github.vgdotnet.osc"
         minSdk 23
         targetSdk 36
-        versionCode 50
-        versionName "1.10.3"
+        versionCode 1
+        versionName "1.0.0"
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
