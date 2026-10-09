@@ -177,4 +177,11 @@
     <string name="adv_log">Журнал</string>
     <string name="adv_log_save">Сохранять журнал в файл</string>
     <string name="adv_log_dir">Папка для журнала</string>
+
+    <string name="link_log">Журнал</string>
+    <string name="log_title">Журнал подключения</string>
+    <string name="log_empty">Попыток подключения ещё не было</string>
+    <string name="log_copy">Копировать</string>
+    <string name="log_copied">Журнал скопирован</string>
+    <string name="log_share">Поделиться</string>
 </resources>

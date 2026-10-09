@@ -66,7 +66,7 @@ internal class Controller(internal val bridge: SharedBridge) {
         bridge.handler = CoroutineExceptionHandler { _, throwable ->
             kill(isReconnectionEnabled) {
                 val header = "OSC: ERR_UNEXPECTED"
-                bridge.service.logWriter?.report(header + "\n" + throwable.stackTraceToString())
+                bridge.service.logWriter.report(header + "\n" + throwable.stackTraceToString(), isError = true)
                 markError(header, bridge.prefs)
                 bridge.service.notifyError(header)
             }
@@ -229,6 +229,7 @@ internal class Controller(internal val bridge: SharedBridge) {
 
         if (received.result == Result.PROCEEDED) {
             assertAlways(received.from == where)
+            bridge.service.logWriter.report(describeStage(where))
 
             return true
         }
@@ -248,12 +249,24 @@ internal class Controller(internal val bridge: SharedBridge) {
                 log += "\n${received.supplement}"
             }
 
-            bridge.service.logWriter?.report(log)
+            bridge.service.logWriter.report(log, isError = true)
             markError(header, bridge.prefs)
             bridge.service.notifyError(header)
         }
 
         return false
+    }
+
+    private fun describeStage(where: Where): String {
+        val detail = when (where) {
+            Where.SSL -> bridge.sslTerminal?.getSession()?.let { "${it.protocol} ${it.cipherSuite}" }
+            Where.LCP -> "MRU ${bridge.currentMRU}, auth ${bridge.currentAuth}"
+            Where.IPCP -> bridge.currentIPv4.joinToString(".") { (it.toInt() and 0xFF).toString() }
+            Where.IP -> "VPN interface established"
+            else -> null
+        }
+
+        return "${where.name}: PROCEEDED" + if (detail != null) " ($detail)" else ""
     }
 
     internal fun disconnect() { // use if the user want to normally disconnect

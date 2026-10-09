@@ -19,11 +19,13 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.preference.PreferenceManager
 import kittoku.osc.R
 import kittoku.osc.SharedBridge
+import kittoku.osc.control.ConnectionLog
 import kittoku.osc.control.Controller
 import kittoku.osc.control.LogWriter
 import kittoku.osc.preference.OscPrefKey
 import kittoku.osc.preference.accessor.getBooleanPrefValue
 import kittoku.osc.preference.accessor.getIntPrefValue
+import kittoku.osc.preference.accessor.getStringPrefValue
 import kittoku.osc.preference.accessor.getURIPrefValue
 import kittoku.osc.preference.accessor.markConnecting
 import kittoku.osc.preference.accessor.markDisconnected
@@ -41,6 +43,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -66,7 +69,7 @@ internal class SstpVpnService : VpnService() {
     private lateinit var notificationManager: NotificationManagerCompat
     internal lateinit var scope: CoroutineScope
 
-    internal var logWriter: LogWriter? = null
+    internal var logWriter: LogWriter = LogWriter(ConnectionLog.shared, null)
     private var controller: Controller?  = null
 
     private var jobReconnect: Job? = null
@@ -110,11 +113,15 @@ internal class SstpVpnService : VpnService() {
                 beForegrounded()
                 resetReconnectionLife(prefs)
                 markConnecting(prefs)
-                if (getBooleanPrefValue(OscPrefKey.LOG_DO_SAVE_LOG, prefs)) {
-                    prepareLogWriter()
-                }
+                ConnectionLog.shared.clear()
+                logWriter.close()
+                logWriter = LogWriter(ConnectionLog.shared, if (getBooleanPrefValue(OscPrefKey.LOG_DO_SAVE_LOG, prefs)) openLogFile() else null)
 
-                logWriter?.write("Establish VPN connection")
+                logWriter.write("Establish VPN connection")
+                logWriter.write(
+                    "Server: ${getStringPrefValue(OscPrefKey.HOME_HOSTNAME, prefs)}:${getIntPrefValue(OscPrefKey.SSL_PORT, prefs)}" +
+                        if (getBooleanPrefValue(OscPrefKey.PROXY_DO_USE_PROXY, prefs)) " via HTTP proxy" else ""
+                )
 
                 initializeClient()
 
@@ -144,35 +151,35 @@ internal class SstpVpnService : VpnService() {
         }
     }
 
-    private fun prepareLogWriter() {
+    private fun openLogFile(): OutputStream? {
         val currentDateTime = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Date())
         val filename = "log_osc_${currentDateTime}.txt"
 
         val prefURI = getURIPrefValue(OscPrefKey.LOG_DIR, prefs)
         if (prefURI == null) {
             notifyError("LOG: ERR_NULL_PREFERENCE")
-            return
+            return null
         }
 
         val dirURI = DocumentFile.fromTreeUri(this, prefURI)
         if (dirURI == null) {
             notifyError("LOG: ERR_NULL_DIRECTORY")
-            return
+            return null
         }
 
         val fileURI = dirURI.createFile("text/plain", filename)
         if (fileURI == null) {
             notifyError("LOG: ERR_NULL_FILE")
-            return
+            return null
         }
 
         val stream = contentResolver.openOutputStream(fileURI.uri, "wa")
         if (stream == null) {
             notifyError("LOG: ERR_NULL_STREAM")
-            return
+            return null
         }
 
-        logWriter = LogWriter(stream)
+        return stream
     }
 
     internal fun launchJobReconnect() {
@@ -184,7 +191,7 @@ internal class SstpVpnService : VpnService() {
 
                     val message = "Reconnection will be tried (LIFE = $life)"
                     notifyMessage(message, NOTIFICATION_RECONNECT_ID, NOTIFICATION_RECONNECT_CHANNEL)
-                    logWriter?.report(message)
+                    logWriter.report(message)
                 }
 
                 delay(getIntPrefValue(OscPrefKey.RECONNECTION_INTERVAL, prefs) * 1000L)
@@ -265,9 +272,8 @@ internal class SstpVpnService : VpnService() {
     }
 
     override fun onDestroy() {
-        logWriter?.write("Terminate VPN connection")
-        logWriter?.close()
-        logWriter = null
+        logWriter.write("Terminate VPN connection")
+        logWriter.close()
 
         controller?.kill(false, null)
         controller = null

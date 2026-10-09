@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kittoku.osc.activity.MainActivity
+import kittoku.osc.control.ConnectionLog
 import kittoku.osc.preference.Profile
 import kittoku.osc.preference.SettingsError
 import kittoku.osc.preference.SettingsSection
@@ -26,6 +27,7 @@ import kittoku.osc.ui.theme.OscTheme
 
 private const val ROUTE_HOME = "home"
 private const val ROUTE_DETAILS = "details"
+private const val ROUTE_LOG = "log"
 private const val ROUTE_PROFILES = "profiles"
 private const val ROUTE_EDIT = "edit"
 private const val ROUTE_EDIT_ROUTES = "edit/routes"
@@ -54,6 +56,7 @@ class AppActivity : ComponentActivity() {
                 val homeState by homeViewModel.uiState.collectAsStateWithLifecycle()
                 val profilesState by profilesViewModel.uiState.collectAsStateWithLifecycle()
                 val currentDraft by profilesViewModel.draft.collectAsStateWithLifecycle()
+                val logLines by ConnectionLog.shared.snapshot.collectAsStateWithLifecycle()
                 val canSwitch = homeState.state == ConnectionState.DISCONNECTED || homeState.state == ConnectionState.ERROR
 
                 val openEditor = { name: String? ->
@@ -69,6 +72,7 @@ class AppActivity : ComponentActivity() {
                             onConnect = homeViewModel::connect,
                             onDisconnect = homeViewModel::disconnect,
                             onOpenDetails = { navController.navigate(ROUTE_DETAILS) },
+                            onOpenLog = { navController.navigate(ROUTE_LOG) },
                             onOpenLegacySettings = openLegacySettings,
                             onSelectProfile = { profilesViewModel.activate(it) },
                             onManageProfiles = { navController.navigate(ROUTE_PROFILES) },
@@ -77,6 +81,9 @@ class AppActivity : ComponentActivity() {
                     }
                     composable(ROUTE_DETAILS) {
                         DetailsScreen(rawStatus = homeState.rawStatus, onBack = popBack)
+                    }
+                    composable(ROUTE_LOG) {
+                        LogScreen(lines = logLines, onBack = popBack)
                     }
                     composable(ROUTE_PROFILES) {
                         ProfilesScreen(

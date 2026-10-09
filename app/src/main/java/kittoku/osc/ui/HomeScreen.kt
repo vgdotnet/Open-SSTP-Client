@@ -71,6 +71,7 @@ internal fun HomeScreen(
     onConnect: () -> String?,
     onDisconnect: () -> Unit,
     onOpenDetails: () -> Unit,
+    onOpenLog: () -> Unit,
     onOpenLegacySettings: () -> Unit,
     onSelectProfile: (String) -> Unit,
     onManageProfiles: () -> Unit,
@@ -139,7 +140,7 @@ internal fun HomeScreen(
 
             when (uiState.state) {
                 ConnectionState.CONNECTED -> ConnectedCaption(uiState)
-                ConnectionState.ERROR -> ErrorCard(uiState.errorCode)
+                ConnectionState.ERROR -> ErrorCard(uiState.errorCode, onOpenLog)
                 else -> {}
             }
 
@@ -165,6 +166,9 @@ internal fun HomeScreen(
             ) {
                 TextButton(onClick = onOpenDetails, enabled = uiState.status != null) {
                     Text(stringResource(R.string.link_details))
+                }
+                TextButton(onClick = onOpenLog) {
+                    Text(stringResource(R.string.link_log))
                 }
                 TextButton(onClick = onManageProfiles) {
                     Text(stringResource(R.string.link_profiles))
@@ -325,7 +329,7 @@ internal fun formatElapsed(millis: Long): String {
 }
 
 @Composable
-private fun ErrorCard(code: String) {
+private fun ErrorCard(code: String, onOpenLog: () -> Unit) {
     val kind = classifyError(code)
 
     Card(
@@ -349,6 +353,9 @@ private fun ErrorCard(code: String) {
                 fontFamily = FontFamily.Monospace,
                 color = MaterialTheme.colorScheme.onErrorContainer,
             )
+            TextButton(onClick = onOpenLog, modifier = Modifier.align(Alignment.End)) {
+                Text(stringResource(R.string.link_log))
+            }
         }
     }
 }

@@ -9,23 +9,27 @@ import java.util.Date
 import java.util.Locale
 
 
-internal class LogWriter(logOutput: OutputStream) {
+internal class LogWriter(private val log: ConnectionLog, fileOutput: OutputStream?) {
     private val mutex = Mutex()
-    private val outputStream = BufferedOutputStream(logOutput)
-    private val currentTime: String
-        get() = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(Date())
+    private val outputStream = fileOutput?.let { BufferedOutputStream(it) }
 
-    internal fun write(message: String) {
-        // use directly if it's cannot be race condition, like onCreate and onDestroy
-        outputStream.write("[$currentTime] $message\n".toByteArray(Charsets.UTF_8))
+    private fun formatTime(millis: Long): String {
+        return SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(Date(millis))
     }
 
-    internal suspend fun report(message: String) {
-        mutex.withLock { write(message) }
+    internal fun write(message: String, isError: Boolean = false) {
+        // use directly if it's cannot be race condition, like onCreate and onDestroy
+        val now = System.currentTimeMillis()
+        log.append(LogLine(now, isError, message))
+        outputStream?.write("[${formatTime(now)}] $message\n".toByteArray(Charsets.UTF_8))
+    }
+
+    internal suspend fun report(message: String, isError: Boolean = false) {
+        mutex.withLock { write(message, isError) }
     }
 
     internal fun close() {
-        outputStream.flush()
-        outputStream.close()
+        outputStream?.flush()
+        outputStream?.close()
     }
 }

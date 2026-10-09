@@ -177,4 +177,11 @@
     <string name="adv_log">Log</string>
     <string name="adv_log_save">Save the log to a file</string>
     <string name="adv_log_dir">Log folder</string>
+
+    <string name="link_log">Log</string>
+    <string name="log_title">Connection log</string>
+    <string name="log_empty">No connection attempts yet</string>
+    <string name="log_copy">Copy</string>
+    <string name="log_copied">Log copied</string>
+    <string name="log_share">Share</string>
 </resources>
