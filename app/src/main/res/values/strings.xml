@@ -1,2 +1,5 @@
 <resources>
+    <string name="home_title">Open SSTP Client</string>
+    <string name="home_placeholder">New interface is under construction</string>
+    <string name="home_open_legacy">Open legacy settings</string>
 </resources>

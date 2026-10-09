@@ -1,0 +1,5 @@
+<resources>
+    <string name="home_title">Open SSTP Client</string>
+    <string name="home_placeholder">Новый интерфейс в разработке</string>
+    <string name="home_open_legacy">Открыть старые настройки</string>
+</resources>

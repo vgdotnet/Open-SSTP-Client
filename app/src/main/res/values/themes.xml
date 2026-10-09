@@ -16,4 +16,6 @@
 
     <style name="Theme.OpenSSTPClient.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="Theme.OpenSSTPClient.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="Theme.OpenSSTPClient.Compose" parent="Theme.Material3.DayNight.NoActionBar" />
 </resources>

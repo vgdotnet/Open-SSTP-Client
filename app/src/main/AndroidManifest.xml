@@ -28,7 +28,8 @@
 
         <activity
             android:exported="true"
-            android:name=".activity.MainActivity">
+            android:name=".ui.AppActivity"
+            android:theme="@style/Theme.OpenSSTPClient.Compose">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -36,6 +37,11 @@
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:exported="false"
+            android:name=".activity.MainActivity">
         </activity>
 
         <activity

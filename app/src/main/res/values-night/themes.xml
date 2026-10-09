@@ -13,4 +13,6 @@
         <item name="android:statusBarColor">@color/teal_A700</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="Theme.OpenSSTPClient.Compose" parent="Theme.Material3.DayNight.NoActionBar" />
 </resources>
