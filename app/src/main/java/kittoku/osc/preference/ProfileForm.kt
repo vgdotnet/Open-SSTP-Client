@@ -1,6 +1,9 @@
 package kittoku.osc.preference
 
+import kotlinx.serialization.Serializable
 
+
+@Serializable
 internal data class ProfileForm(
     val name: String = "",
     val hostname: String = "",

@@ -3,22 +3,24 @@ package kittoku.osc.ui
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import kittoku.osc.activity.MainActivity
+import kittoku.osc.preference.Profile
+import kittoku.osc.preference.SettingsError
+import kittoku.osc.preference.SettingsSection
+import kittoku.osc.preference.profileSettingsErrors
 import kittoku.osc.ui.theme.OscTheme
 
 
@@ -26,7 +28,9 @@ private const val ROUTE_HOME = "home"
 private const val ROUTE_DETAILS = "details"
 private const val ROUTE_PROFILES = "profiles"
 private const val ROUTE_EDIT = "edit"
-private const val ARG_NAME = "name"
+private const val ROUTE_EDIT_ROUTES = "edit/routes"
+private const val ROUTE_EDIT_APPS = "edit/apps"
+private const val ROUTE_EDIT_ADVANCED = "edit/advanced"
 
 class AppActivity : ComponentActivity() {
     private val homeViewModel: HomeViewModel by viewModels()
@@ -49,11 +53,14 @@ class AppActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val homeState by homeViewModel.uiState.collectAsStateWithLifecycle()
                 val profilesState by profilesViewModel.uiState.collectAsStateWithLifecycle()
+                val currentDraft by profilesViewModel.draft.collectAsStateWithLifecycle()
                 val canSwitch = homeState.state == ConnectionState.DISCONNECTED || homeState.state == ConnectionState.ERROR
 
                 val openEditor = { name: String? ->
-                    navController.navigate(if (name == null) ROUTE_EDIT else "$ROUTE_EDIT?$ARG_NAME=${Uri.encode(name)}")
+                    profilesViewModel.startEdit(name)
+                    navController.navigate(ROUTE_EDIT)
                 }
+                val popBack: () -> Unit = { navController.popBackStack() }
 
                 NavHost(navController = navController, startDestination = ROUTE_HOME) {
                     composable(ROUTE_HOME) {
@@ -69,13 +76,13 @@ class AppActivity : ComponentActivity() {
                         )
                     }
                     composable(ROUTE_DETAILS) {
-                        DetailsScreen(rawStatus = homeState.rawStatus, onBack = { navController.popBackStack() })
+                        DetailsScreen(rawStatus = homeState.rawStatus, onBack = popBack)
                     }
                     composable(ROUTE_PROFILES) {
                         ProfilesScreen(
                             uiState = profilesState,
                             canSwitch = canSwitch,
-                            onBack = { navController.popBackStack() },
+                            onBack = popBack,
                             onActivate = profilesViewModel::activate,
                             onCreate = { openEditor(null) },
                             onEdit = { openEditor(it) },
@@ -85,26 +92,42 @@ class AppActivity : ComponentActivity() {
                             importJson = profilesViewModel::importJson,
                         )
                     }
-                    composable(
-                        route = "$ROUTE_EDIT?$ARG_NAME={$ARG_NAME}",
-                        arguments = listOf(navArgument(ARG_NAME) {
-                            type = NavType.StringType
-                            nullable = true
-                            defaultValue = null
-                        }),
-                    ) { entry ->
-                        val name = entry.arguments?.getString(ARG_NAME)
-                        val initial = remember(name) { profilesViewModel.formFor(name) }
-
-                        ProfileEditScreen(
-                            isNew = name == null,
-                            initial = initial,
-                            onSave = { form ->
-                                profilesViewModel.save(name, form).also { if (it == null) navController.popBackStack() }
-                            },
-                            onBack = { navController.popBackStack() },
-                            onOpenLegacySettings = openLegacySettings,
-                        )
+                    composable(ROUTE_EDIT) {
+                        rememberLastNonNull(currentDraft)?.also { draft ->
+                            ProfileEditScreen(
+                                draft = draft,
+                                onFormChange = profilesViewModel::updateForm,
+                                onOpenSection = { section ->
+                                    navController.navigate(
+                                        when (section) {
+                                            SettingsSection.ROUTES -> ROUTE_EDIT_ROUTES
+                                            SettingsSection.APPS -> ROUTE_EDIT_APPS
+                                            SettingsSection.ADVANCED -> ROUTE_EDIT_ADVANCED
+                                        }
+                                    )
+                                },
+                                onSave = { if (profilesViewModel.saveDraft()) navController.popBackStack() },
+                                onBack = {
+                                    navController.popBackStack()
+                                    profilesViewModel.discardDraft()
+                                },
+                            )
+                        }
+                    }
+                    composable(ROUTE_EDIT_ROUTES) {
+                        DraftSection(currentDraft) { profile, errors ->
+                            RoutesSettingsScreen(profile, errors, profilesViewModel::updateProfile, popBack)
+                        }
+                    }
+                    composable(ROUTE_EDIT_APPS) {
+                        DraftSection(currentDraft) { profile, _ ->
+                            AppsSettingsScreen(profile, profilesViewModel::updateProfile, popBack)
+                        }
+                    }
+                    composable(ROUTE_EDIT_ADVANCED) {
+                        DraftSection(currentDraft) { profile, errors ->
+                            AdvancedSettingsScreen(profile, errors, profilesViewModel::updateProfile, popBack)
+                        }
                     }
                 }
             }
@@ -115,4 +138,15 @@ class AppActivity : ComponentActivity() {
         super.onResume()
         profilesViewModel.onResume()
     }
+}
+
+// Errors are highlighted only after the user tried to save
+@Composable
+private fun DraftSection(draft: ProfileDraft?, content: @Composable (Profile, Set<SettingsError>) -> Unit) {
+    val shown = rememberLastNonNull(draft) ?: return
+    val profile = remember(shown.json) { shown.profile() }
+    val errors = remember(shown.json, shown.attemptedSave) {
+        if (shown.attemptedSave) profileSettingsErrors(profile) else emptySet()
+    }
+    content(profile, errors)
 }

@@ -105,7 +105,12 @@ internal class ProfileStore(private val prefs: SharedPreferences) {
         val profile = originalName?.let { read(it) } ?: Profile()
         form.applyTo(profile)
 
-        val name = form.effectiveName()
+        return saveProfile(originalName, form.effectiveName(), profile)
+    }
+
+    fun saveProfile(originalName: String?, name: String, profile: Profile): String {
+        captureActive()
+
         val wasActive = originalName != null && originalName == activeName
         if (originalName != null && originalName != name) {
             prefs.edit().remove(keyOf(originalName)).apply()
