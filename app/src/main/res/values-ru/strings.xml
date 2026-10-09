@@ -2,7 +2,6 @@
     <string name="home_title">Open SSTP Client</string>
     <string name="menu_more">Ещё</string>
     <string name="menu_legacy_settings">Старые настройки</string>
-    <string name="profile_none">Подключение не настроено</string>
 
     <string name="state_disconnected">Отключено</string>
     <string name="state_connecting">Подключение…</string>
@@ -46,4 +45,47 @@
     <string name="error_timeout_hint">Сервер перестал отвечать.</string>
     <string name="error_unknown_title">Не удалось подключиться</string>
     <string name="error_unknown_hint">Подробности в журнале.</string>
+
+    <string name="profile_create">Создать подключение</string>
+    <string name="link_profiles">Подключения</string>
+    <string name="profiles_title">Подключения</string>
+    <string name="profiles_manage">Все подключения</string>
+    <string name="profiles_empty">Подключений пока нет</string>
+    <string name="profiles_add">Добавить подключение</string>
+    <string name="profiles_import">Импорт</string>
+    <string name="profiles_imported">Импортировано как %1$s</string>
+    <string name="profiles_import_failed">Этот файл не похож на профиль подключения</string>
+    <string name="profiles_exported">Экспортировано</string>
+    <string name="profiles_switch_locked">Сначала отключитесь</string>
+    <string name="profile_edit">Изменить</string>
+    <string name="profile_duplicate">Дублировать</string>
+    <string name="profile_export">Экспорт</string>
+    <string name="profile_delete">Удалить</string>
+    <string name="profile_delete_title">Удалить «%1$s»?</string>
+    <string name="profile_delete_text">Настройки подключения будут удалены с этого устройства.</string>
+    <string name="profile_export_title">Экспорт «%1$s»</string>
+    <string name="profile_export_text">Пароль будет записан в файл открытым текстом.</string>
+    <string name="action_export">Экспортировать</string>
+    <string name="action_delete">Удалить</string>
+    <string name="action_save">Сохранить</string>
+
+    <string name="edit_title_new">Новое подключение</string>
+    <string name="edit_title">Подключение</string>
+    <string name="field_name">Название</string>
+    <string name="field_name_hint">Домашний роутер</string>
+    <string name="field_name_support">Если не заполнено, будет использовано имя сервера</string>
+    <string name="field_hostname">Сервер</string>
+    <string name="field_hostname_hint">vpn.example.com</string>
+    <string name="field_port">Порт</string>
+    <string name="field_username">Имя пользователя</string>
+    <string name="field_password">Пароль</string>
+    <string name="field_password_show">Показать пароль</string>
+    <string name="field_password_hide">Скрыть пароль</string>
+    <string name="field_camouflage">Секрет маскировки</string>
+    <string name="field_camouflage_support">Только для Keenetic. Оставьте пустым, если маскировка выключена.</string>
+    <string name="error_hostname_empty">Укажите имя сервера</string>
+    <string name="error_hostname_invalid">Укажите только имя хоста, без https://, пути и порта</string>
+    <string name="error_port_invalid">Укажите порт от 1 до 65535</string>
+    <string name="error_name_taken">Подключение с таким названием уже есть</string>
+    <string name="edit_legacy_hint">Маршруты, DNS, TLS и остальные настройки активного подключения пока находятся в старых настройках.</string>
 </resources>

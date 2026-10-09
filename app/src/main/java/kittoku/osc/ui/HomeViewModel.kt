@@ -9,18 +9,19 @@ import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import kittoku.osc.preference.CONNECTION_STATE_CONNECTED
 import kittoku.osc.preference.CONNECTION_STATE_CONNECTING
+import kittoku.osc.preference.ACTIVE_PROFILE_KEY
 import kittoku.osc.preference.CONNECTION_STATE_ERROR
 import kittoku.osc.preference.OscPrefKey
+import kittoku.osc.preference.PROFILE_KEY_HEADER
+import kittoku.osc.preference.ProfileStore
 import kittoku.osc.preference.accessor.getConnectionState
 import kittoku.osc.preference.accessor.getStringPrefValue
 import kittoku.osc.preference.checkPreferences
 import kittoku.osc.service.ACTION_VPN_CONNECT
 import kittoku.osc.service.ACTION_VPN_DISCONNECT
 import kittoku.osc.service.SstpVpnService
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
@@ -29,6 +30,7 @@ internal enum class ConnectionState { DISCONNECTED, CONNECTING, CONNECTED, ERROR
 
 internal data class HomeUiState(
     val profileName: String,
+    val profileNames: List<String>,
     val state: ConnectionState,
     val connectedSince: Long?,
     val errorCode: String,
@@ -37,7 +39,6 @@ internal data class HomeUiState(
 )
 
 private val OBSERVED_KEYS = setOf(
-    OscPrefKey.HOME_HOSTNAME,
     OscPrefKey.HOME_STATUS,
     OscPrefKey.CONNECTION_STATE,
     OscPrefKey.CONNECTED_SINCE,
@@ -46,25 +47,19 @@ private val OBSERVED_KEYS = setOf(
 
 internal class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(application)
+    private val profiles = ProfileStore(prefs)
 
-    val uiState: StateFlow<HomeUiState> = prefsChanges()
+    val uiState: StateFlow<HomeUiState> = prefs
+        .changes { it in OBSERVED_KEYS || it == ACTIVE_PROFILE_KEY || it.startsWith(PROFILE_KEY_HEADER) }
         .map { readState() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), readState())
-
-    private fun prefsChanges() = callbackFlow {
-        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key in OBSERVED_KEYS) trySend(Unit)
-        }
-        prefs.registerOnSharedPreferenceChangeListener(listener)
-        trySend(Unit)
-        awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
-    }
 
     private fun readState(): HomeUiState {
         val rawStatus = getStringPrefValue(OscPrefKey.HOME_STATUS, prefs)
 
         return HomeUiState(
-            profileName = getStringPrefValue(OscPrefKey.HOME_HOSTNAME, prefs),
+            profileName = profiles.activeName.orEmpty(),
+            profileNames = profiles.names,
             state = when (getConnectionState(prefs)) {
                 CONNECTION_STATE_CONNECTING -> ConnectionState.CONNECTING
                 CONNECTION_STATE_CONNECTED -> ConnectionState.CONNECTED

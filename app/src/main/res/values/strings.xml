@@ -2,7 +2,6 @@
     <string name="home_title">Open SSTP Client</string>
     <string name="menu_more">More</string>
     <string name="menu_legacy_settings">Legacy settings</string>
-    <string name="profile_none">No connection configured</string>
 
     <string name="state_disconnected">Disconnected</string>
     <string name="state_connecting">Connecting…</string>
@@ -46,4 +45,47 @@
     <string name="error_timeout_hint">The server stopped responding.</string>
     <string name="error_unknown_title">Connection failed</string>
     <string name="error_unknown_hint">See the log for details.</string>
+
+    <string name="profile_create">Create connection</string>
+    <string name="link_profiles">Connections</string>
+    <string name="profiles_title">Connections</string>
+    <string name="profiles_manage">Manage connections</string>
+    <string name="profiles_empty">No connections yet</string>
+    <string name="profiles_add">Add connection</string>
+    <string name="profiles_import">Import</string>
+    <string name="profiles_imported">Imported as %1$s</string>
+    <string name="profiles_import_failed">This file is not a connection profile</string>
+    <string name="profiles_exported">Exported</string>
+    <string name="profiles_switch_locked">Disconnect first</string>
+    <string name="profile_edit">Edit</string>
+    <string name="profile_duplicate">Duplicate</string>
+    <string name="profile_export">Export</string>
+    <string name="profile_delete">Delete</string>
+    <string name="profile_delete_title">Delete %1$s?</string>
+    <string name="profile_delete_text">The connection settings will be removed from this device.</string>
+    <string name="profile_export_title">Export %1$s</string>
+    <string name="profile_export_text">The file will contain the password in plain text.</string>
+    <string name="action_export">Export</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_save">Save</string>
+
+    <string name="edit_title_new">New connection</string>
+    <string name="edit_title">Edit connection</string>
+    <string name="field_name">Name</string>
+    <string name="field_name_hint">Home router</string>
+    <string name="field_name_support">If empty, the server name is used</string>
+    <string name="field_hostname">Server</string>
+    <string name="field_hostname_hint">vpn.example.com</string>
+    <string name="field_port">Port</string>
+    <string name="field_username">Username</string>
+    <string name="field_password">Password</string>
+    <string name="field_password_show">Show password</string>
+    <string name="field_password_hide">Hide password</string>
+    <string name="field_camouflage">Camouflage secret</string>
+    <string name="field_camouflage_support">Keenetic only. Leave empty if camouflage is off.</string>
+    <string name="error_hostname_empty">Enter the server name</string>
+    <string name="error_hostname_invalid">Enter only the host name, without https://, a path or a port</string>
+    <string name="error_port_invalid">Enter a port from 1 to 65535</string>
+    <string name="error_name_taken">A connection with this name already exists</string>
+    <string name="edit_legacy_hint">Routes, DNS, TLS and other settings of the active connection are in the legacy settings for now.</string>
 </resources>

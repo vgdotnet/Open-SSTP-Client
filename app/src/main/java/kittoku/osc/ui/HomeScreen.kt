@@ -18,7 +18,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.Lock
@@ -68,6 +70,9 @@ internal fun HomeScreen(
     onDisconnect: () -> Unit,
     onOpenDetails: () -> Unit,
     onOpenLegacySettings: () -> Unit,
+    onSelectProfile: (String) -> Unit,
+    onManageProfiles: () -> Unit,
+    onCreateProfile: () -> Unit,
 ) {
     val context = LocalContext.current
     var menuExpanded by remember { mutableStateOf(false) }
@@ -116,9 +121,12 @@ internal fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             ProfileCard(
-                name = uiState.profileName.ifEmpty { stringResource(R.string.profile_none) },
+                activeName = uiState.profileName,
+                names = uiState.profileNames,
                 enabled = uiState.state == ConnectionState.DISCONNECTED || uiState.state == ConnectionState.ERROR,
-                onClick = onOpenLegacySettings,
+                onSelect = onSelectProfile,
+                onManage = onManageProfiles,
+                onCreate = onCreateProfile,
             )
 
             Spacer(Modifier.height(32.dp))
@@ -141,7 +149,13 @@ internal fun HomeScreen(
 
             Spacer(Modifier.weight(1f))
 
-            MainButton(uiState.state, connect, onDisconnect)
+            if (uiState.profileNames.isEmpty()) {
+                Button(onClick = onCreateProfile, modifier = Modifier.fillMaxWidth().height(52.dp)) {
+                    Text(stringResource(R.string.profile_create))
+                }
+            } else {
+                MainButton(uiState.state, connect, onDisconnect)
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -150,27 +164,75 @@ internal fun HomeScreen(
                 TextButton(onClick = onOpenDetails, enabled = uiState.status != null) {
                     Text(stringResource(R.string.link_details))
                 }
+                TextButton(onClick = onManageProfiles) {
+                    Text(stringResource(R.string.link_profiles))
+                }
             }
         }
     }
 }
 
 @Composable
-private fun ProfileCard(name: String, enabled: Boolean, onClick: () -> Unit) {
-    OutlinedCard(onClick = onClick, enabled = enabled, modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
+private fun ProfileCard(
+    activeName: String,
+    names: List<String>,
+    enabled: Boolean,
+    onSelect: (String) -> Unit,
+    onManage: () -> Unit,
+    onCreate: () -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val hasProfiles = names.isNotEmpty()
+
+    Box(modifier = Modifier.fillMaxWidth()) {
+        OutlinedCard(
+            onClick = { if (hasProfiles) expanded = true else onCreate() },
+            enabled = enabled,
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(
-                text = name,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.weight(1f),
-            )
-            Icon(
-                imageVector = if (enabled) Icons.Outlined.KeyboardArrowDown else Icons.Outlined.Lock,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = if (hasProfiles) activeName else stringResource(R.string.profile_create),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f),
+                )
+                Icon(
+                    imageVector = when {
+                        !enabled -> Icons.Outlined.Lock
+                        hasProfiles -> Icons.Outlined.KeyboardArrowDown
+                        else -> Icons.Default.Add
+                    },
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            names.forEach { name ->
+                DropdownMenuItem(
+                    text = { Text(name) },
+                    leadingIcon = {
+                        if (name == activeName) Icon(Icons.Outlined.Check, contentDescription = null)
+                        else Spacer(Modifier.size(24.dp))
+                    },
+                    onClick = {
+                        expanded = false
+                        onSelect(name)
+                    },
+                )
+            }
+            HorizontalDivider()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.profiles_manage)) },
+                leadingIcon = { Spacer(Modifier.size(24.dp)) },
+                onClick = {
+                    expanded = false
+                    onManage()
+                },
             )
         }
     }

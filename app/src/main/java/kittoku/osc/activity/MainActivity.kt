@@ -148,10 +148,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Profiles are managed by the new UI; the legacy menu would bypass the active-profile bookkeeping
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        MenuInflater(this).inflate(R.menu.home_menu, menu)
-
-        return true
+        return false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
