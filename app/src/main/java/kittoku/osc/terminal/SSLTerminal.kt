@@ -33,10 +33,14 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.yield
 import java.io.BufferedInputStream
+import java.io.EOFException
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.net.InetSocketAddress
 import java.net.Socket
 import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import java.nio.ByteBuffer
 import java.security.KeyStore
 import java.security.cert.CertPathValidatorException
@@ -57,7 +61,9 @@ import javax.net.ssl.TrustManagerFactory
 private const val HTTP_DELIMITER = "\r\n"
 private const val HTTP_SUFFIX = "\r\n\r\n"
 
-internal const val SSL_REQUEST_INTERVAL = 10_000L
+// the whole SSL stage: TCP connect, TLS handshake, HTTP request; must exceed CONNECT_TIMEOUT
+internal const val SSL_REQUEST_INTERVAL = 20_000L
+private const val CONNECT_TIMEOUT = 10_000
 
 internal class SSLTerminal(private val bridge: SharedBridge) {
     private val mutex = Mutex()
@@ -161,10 +167,22 @@ internal class SSLTerminal(private val bridge: SharedBridge) {
 
         val socketHostname = if (doUseProxy) getStringPrefValue(OscPrefKey.PROXY_HOSTNAME, bridge.prefs) else sslHostname
         val socketPort = if (doUseProxy) getIntPrefValue(OscPrefKey.PROXY_PORT, bridge.prefs) else sslPort
-        socket = Socket(socketHostname, socketPort).also {
-            socketInputStream = it.getInputStream()
-            socketOutputStream = it.getOutputStream()
+        // assigned before connecting so that close() can abort a hanging connect
+        val newSocket = Socket()
+        socket = newSocket
+
+        try {
+            newSocket.connect(InetSocketAddress(socketHostname, socketPort), CONNECT_TIMEOUT)
+        } catch (e: UnknownHostException) {
+            bridge.controlMailbox.send(ControlMessage(Where.SSL, Result.ERR_UNKNOWN_HOST, e.toString()))
+            return false
+        } catch (e: IOException) { // timeout, refused, unreachable, or closed by kill()
+            bridge.controlMailbox.send(ControlMessage(Where.SSL, Result.ERR_CONNECTION_FAILED, e.toString()))
+            return false
         }
+
+        socketInputStream = newSocket.getInputStream()
+        socketOutputStream = newSocket.getOutputStream()
 
         if (doUseProxy) {
             if (!establishProxy()) {
@@ -254,13 +272,10 @@ internal class SSLTerminal(private val bridge: SharedBridge) {
         socketOutputStream.write(request)
         socketOutputStream.flush()
 
-        var response = ""
-        while (true) {
-            response += socketInputStream.read().toChar()
-
-            if (response.endsWith(HTTP_SUFFIX)) {
-                break
-            }
+        val response = readHttpResponseHead(socketInputStream)
+        if (response == null) {
+            bridge.controlMailbox.send(ControlMessage(Where.PROXY, Result.ERR_CONNECTION_CLOSED))
+            return false
         }
 
         val responseHeader = response.split(HTTP_DELIMITER)[0]
@@ -426,6 +441,8 @@ internal class SSLTerminal(private val bridge: SharedBridge) {
                             inboundBuffer.limit(),
                             inboundBuffer.capacityAfterLimit
                         )
+
+                        if (readSize < 0) throw EOFException("The server closed the connection")
 
                         inboundBuffer.limit(inboundBuffer.limit() + readSize)
                     } catch (_: SocketTimeoutException) { }

@@ -46,7 +46,7 @@ internal fun checkPreferences(prefs: SharedPreferences): String? {
     if (doUseCustomSNI && customSNIHostname.isEmpty()) return "Custom SNI Hostname must not be blank"
 
     if (getBooleanPrefValue(OscPrefKey.PROXY_DO_USE_PROXY, prefs)) {
-        getStringPrefValue(OscPrefKey.HOME_HOSTNAME, prefs).also {
+        getStringPrefValue(OscPrefKey.PROXY_HOSTNAME, prefs).also {
             if (it.isEmpty()) return "Proxy server hostname is missing"
         }
 
@@ -60,7 +60,7 @@ internal fun checkPreferences(prefs: SharedPreferences): String? {
     }
 
     getIntPrefValue(OscPrefKey.PPP_MTU, prefs).also {
-        if (it !in MIN_MTU..MAX_MTU) return "The given MRU is out of $MIN_MTU-$MAX_MTU"
+        if (it !in MIN_MTU..MAX_MTU) return "The given MTU is out of $MIN_MTU-$MAX_MTU"
     }
 
     val isIPv4Enabled = getBooleanPrefValue(OscPrefKey.PPP_IPv4_ENABLED, prefs)

@@ -5,7 +5,9 @@ internal enum class ErrorKind {
     CREDENTIALS,
     AUTH_PROTOCOL,
     CERTIFICATE,
+    UNKNOWN_HOST,
     HOST_UNREACHABLE,
+    TLS_STALLED,
     NOT_SSTP_SERVER,
     PROXY,
     SERVER_CLOSED,
@@ -27,7 +29,10 @@ internal fun classifyError(code: String): ErrorKind {
         where == "LCP_AUTH" -> ErrorKind.AUTH_PROTOCOL
         where == "CERT" || where == "CERT_PATH" -> ErrorKind.CERTIFICATE
         where == "SSL" && result == "ERR_VERIFICATION_FAILED" -> ErrorKind.CERTIFICATE
-        where == "SSL" && result == "ERR_TIMEOUT" -> ErrorKind.HOST_UNREACHABLE
+        where == "SSL" && result == "ERR_UNKNOWN_HOST" -> ErrorKind.UNKNOWN_HOST
+        where == "SSL" && result == "ERR_CONNECTION_FAILED" -> ErrorKind.HOST_UNREACHABLE
+        where == "SSL" && result == "ERR_TIMEOUT" -> ErrorKind.TLS_STALLED
+        result == "ERR_CONNECTION_CLOSED" -> ErrorKind.SERVER_CLOSED
         where == "SSL" && result == "ERR_UNEXPECTED_MESSAGE" -> ErrorKind.NOT_SSTP_SERVER
         where == "SSTP_REQUEST" && result == "ERR_COUNT_EXHAUSTED" -> ErrorKind.NOT_SSTP_SERVER
         where == "PROXY" -> ErrorKind.PROXY

@@ -364,7 +364,9 @@ private fun ErrorKind.titleRes() = when (this) {
     ErrorKind.CREDENTIALS -> R.string.error_credentials_title
     ErrorKind.AUTH_PROTOCOL -> R.string.error_auth_protocol_title
     ErrorKind.CERTIFICATE -> R.string.error_certificate_title
+    ErrorKind.UNKNOWN_HOST -> R.string.error_unknown_host_title
     ErrorKind.HOST_UNREACHABLE -> R.string.error_unreachable_title
+    ErrorKind.TLS_STALLED -> R.string.error_tls_stalled_title
     ErrorKind.NOT_SSTP_SERVER -> R.string.error_not_sstp_title
     ErrorKind.PROXY -> R.string.error_proxy_title
     ErrorKind.SERVER_CLOSED -> R.string.error_server_closed_title
@@ -376,7 +378,9 @@ private fun ErrorKind.hintRes() = when (this) {
     ErrorKind.CREDENTIALS -> R.string.error_credentials_hint
     ErrorKind.AUTH_PROTOCOL -> R.string.error_auth_protocol_hint
     ErrorKind.CERTIFICATE -> R.string.error_certificate_hint
+    ErrorKind.UNKNOWN_HOST -> R.string.error_unknown_host_hint
     ErrorKind.HOST_UNREACHABLE -> R.string.error_unreachable_hint
+    ErrorKind.TLS_STALLED -> R.string.error_tls_stalled_hint
     ErrorKind.NOT_SSTP_SERVER -> R.string.error_not_sstp_hint
     ErrorKind.PROXY -> R.string.error_proxy_hint
     ErrorKind.SERVER_CLOSED -> R.string.error_server_closed_hint

@@ -37,6 +37,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withTimeoutOrNull
+import java.io.EOFException
 
 
 internal class Controller(internal val bridge: SharedBridge) {
@@ -65,7 +66,7 @@ internal class Controller(internal val bridge: SharedBridge) {
     private fun attachHandler() {
         bridge.handler = CoroutineExceptionHandler { _, throwable ->
             kill(isReconnectionEnabled) {
-                val header = "OSC: ERR_UNEXPECTED"
+                val header = if (throwable is EOFException) "SSL: ${Result.ERR_CONNECTION_CLOSED.name}" else "OSC: ERR_UNEXPECTED"
                 bridge.service.logWriter.report(header + "\n" + throwable.stackTraceToString(), isError = true)
                 markError(header, bridge.prefs)
                 bridge.service.notifyError(header)

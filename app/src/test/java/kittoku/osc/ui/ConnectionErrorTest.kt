@@ -22,7 +22,11 @@ class ConnectionErrorTest {
 
     @Test
     fun transportProblems() {
-        assertEquals(ErrorKind.HOST_UNREACHABLE, classifyError("SSL: ERR_TIMEOUT"))
+        assertEquals(ErrorKind.UNKNOWN_HOST, classifyError("SSL: ERR_UNKNOWN_HOST"))
+        assertEquals(ErrorKind.HOST_UNREACHABLE, classifyError("SSL: ERR_CONNECTION_FAILED"))
+        assertEquals(ErrorKind.TLS_STALLED, classifyError("SSL: ERR_TIMEOUT"))
+        assertEquals(ErrorKind.SERVER_CLOSED, classifyError("SSL: ERR_CONNECTION_CLOSED"))
+        assertEquals(ErrorKind.SERVER_CLOSED, classifyError("PROXY: ERR_CONNECTION_CLOSED"))
         assertEquals(ErrorKind.NOT_SSTP_SERVER, classifyError("SSL: ERR_UNEXPECTED_MESSAGE"))
         assertEquals(ErrorKind.NOT_SSTP_SERVER, classifyError("SSTP_REQUEST: ERR_COUNT_EXHAUSTED"))
         assertEquals(ErrorKind.PROXY, classifyError("PROXY: ERR_AUTHENTICATION_FAILED"))

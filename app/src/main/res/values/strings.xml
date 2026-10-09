@@ -33,8 +33,12 @@
     <string name="error_auth_protocol_hint">The server does not accept any of the selected authentication protocols.</string>
     <string name="error_certificate_title">Server certificate not trusted</string>
     <string name="error_certificate_hint">The certificate chain or the hostname could not be verified. Check the hostname or add the certificate as trusted.</string>
+    <string name="error_unknown_host_title">Server name not found</string>
+    <string name="error_unknown_host_hint">DNS could not resolve the server name. Check the spelling and your network.</string>
     <string name="error_unreachable_title">Server not reachable</string>
-    <string name="error_unreachable_hint">No TLS response from the server. Check the hostname, the port and your network.</string>
+    <string name="error_unreachable_hint">No answer on this port. Check the hostname, the port and your network.</string>
+    <string name="error_tls_stalled_title">TLS handshake did not complete</string>
+    <string name="error_tls_stalled_hint">The server accepted the connection but TLS never finished. Typical for a filtered network.</string>
     <string name="error_not_sstp_title">Not an SSTP server</string>
     <string name="error_not_sstp_hint">The server answered, but not with SSTP. Check the port and the server settings.</string>
     <string name="error_proxy_title">Proxy error</string>

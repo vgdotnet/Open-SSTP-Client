@@ -33,8 +33,12 @@
     <string name="error_auth_protocol_hint">Сервер не принимает ни один из выбранных протоколов аутентификации.</string>
     <string name="error_certificate_title">Сертификат сервера не доверенный</string>
     <string name="error_certificate_hint">Не удалось проверить цепочку сертификатов или имя хоста. Проверьте имя сервера или добавьте сертификат в доверенные.</string>
+    <string name="error_unknown_host_title">Имя сервера не найдено</string>
+    <string name="error_unknown_host_hint">DNS не смог определить адрес сервера. Проверьте написание и сеть.</string>
     <string name="error_unreachable_title">Сервер недоступен</string>
-    <string name="error_unreachable_hint">Нет ответа TLS от сервера. Проверьте имя сервера, порт и сеть.</string>
+    <string name="error_unreachable_hint">Порт не отвечает. Проверьте имя сервера, порт и сеть.</string>
+    <string name="error_tls_stalled_title">TLS-рукопожатие не завершилось</string>
+    <string name="error_tls_stalled_hint">Сервер принял соединение, но TLS так и не прошёл. Так обычно выглядит фильтрация в сети.</string>
     <string name="error_not_sstp_title">Это не SSTP-сервер</string>
     <string name="error_not_sstp_hint">Сервер ответил, но не по SSTP. Проверьте порт и настройки сервера.</string>
     <string name="error_proxy_title">Ошибка прокси</string>
