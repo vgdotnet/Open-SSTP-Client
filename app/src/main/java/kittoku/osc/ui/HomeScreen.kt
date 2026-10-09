@@ -22,7 +22,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.ErrorOutline
-import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material3.Button
@@ -31,6 +30,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -172,6 +174,7 @@ internal fun HomeScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProfileCard(
     activeName: String,
@@ -184,11 +187,21 @@ private fun ProfileCard(
     var expanded by remember { mutableStateOf(false) }
     val hasProfiles = names.isNotEmpty()
 
-    Box(modifier = Modifier.fillMaxWidth()) {
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { open ->
+            when {
+                !enabled -> expanded = false
+                hasProfiles -> expanded = open
+                else -> onCreate()
+            }
+        },
+        modifier = Modifier.fillMaxWidth(),
+    ) {
         OutlinedCard(
-            onClick = { if (hasProfiles) expanded = true else onCreate() },
-            enabled = enabled,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled),
         ) {
             Row(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
@@ -199,22 +212,18 @@ private fun ProfileCard(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.weight(1f),
                 )
-                Icon(
-                    imageVector = when {
-                        !enabled -> Icons.Outlined.Lock
-                        hasProfiles -> Icons.Outlined.KeyboardArrowDown
-                        else -> Icons.Default.Add
-                    },
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                when {
+                    !enabled -> Icon(Icons.Outlined.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    hasProfiles -> ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    else -> Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
         }
 
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             names.forEach { name ->
                 DropdownMenuItem(
-                    text = { Text(name) },
+                    text = { Text(name, style = MaterialTheme.typography.bodyLarge) },
                     leadingIcon = {
                         if (name == activeName) Icon(Icons.Outlined.Check, contentDescription = null)
                         else Spacer(Modifier.size(24.dp))
@@ -223,16 +232,18 @@ private fun ProfileCard(
                         expanded = false
                         onSelect(name)
                     },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                 )
             }
             HorizontalDivider()
             DropdownMenuItem(
-                text = { Text(stringResource(R.string.profiles_manage)) },
+                text = { Text(stringResource(R.string.profiles_manage), style = MaterialTheme.typography.bodyLarge) },
                 leadingIcon = { Spacer(Modifier.size(24.dp)) },
                 onClick = {
                     expanded = false
                     onManage()
                 },
+                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
             )
         }
     }
