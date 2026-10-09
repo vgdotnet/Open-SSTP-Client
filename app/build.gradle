@@ -5,13 +5,31 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version '2.4.10'
 }
 
+// Release signing: environment variables (CI), then Gradle properties, then .secret/signing.properties (local).
+// Without a complete set the release build stays unsigned.
+def localSigning = new Properties()
+def localSigningFile = rootProject.file('.secret/signing.properties')
+if (localSigningFile.exists()) {
+    localSigningFile.withInputStream { localSigning.load(it) }
+}
+
+def signingValue = { String key, String env ->
+    providers.environmentVariable(env).getOrNull() ?: providers.gradleProperty("osc.$key").getOrNull() ?: localSigning.getProperty(key)
+}
+
+def releaseStoreFile = signingValue('storeFile', 'OSC_STORE_FILE')
+def releaseStorePassword = signingValue('storePassword', 'OSC_STORE_PASSWORD')
+def releaseKeyAlias = signingValue('keyAlias', 'OSC_KEY_ALIAS')
+def releaseKeyPassword = signingValue('keyPassword', 'OSC_KEY_PASSWORD') ?: releaseStorePassword
+def hasReleaseSigning = releaseStoreFile && releaseStorePassword && releaseKeyAlias
+
 android {
     namespace 'kittoku.osc'
 
     compileSdk 36
 
     defaultConfig {
-        applicationId "kittoku.osc"
+        applicationId "io.github.vgdotnet.osc"
         minSdk 23
         targetSdk 36
         versionCode 50
@@ -20,16 +38,30 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            release {
+                storeFile rootProject.file(releaseStoreFile)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            resValue "string", "app_name", "Open SSTP Client"
+            resValue "string", "app_name", "Homeward"
         }
         debug {
-            // separate package so the debug build can live next to the Play Store release
+            // separate package so the debug build can live next to the release build
             applicationIdSuffix ".dev"
-            resValue "string", "app_name", "OSC dev"
+            resValue "string", "app_name", "Homeward dev"
         }
     }
 

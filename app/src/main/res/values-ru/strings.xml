@@ -1,5 +1,5 @@
 <resources>
-    <string name="home_title">Open SSTP Client</string>
+    <string name="home_title">Homeward SSTP</string>
     <string name="menu_more">Ещё</string>
 
     <string name="state_disconnected">Отключено</string>
