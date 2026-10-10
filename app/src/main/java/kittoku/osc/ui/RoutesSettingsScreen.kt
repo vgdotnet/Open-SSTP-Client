@@ -60,7 +60,7 @@ internal fun RoutesSettingsScreen(
                 ProfileTextField(
                     profile, OscPrefKey.ROUTE_BYPASS_DOMAINS, onEdit,
                     label = R.string.bypass_field,
-                    placeholder = "ozon.ru\nsberbank.ru",
+                    placeholder = "shop.example.com\nbank.example.net",
                     supporting = R.string.bypass_field_support,
                     error = if (SettingsError.BYPASS_DOMAINS_INVALID in errors) R.string.error_domains_invalid else null,
                     keyboardType = KeyboardType.Uri,

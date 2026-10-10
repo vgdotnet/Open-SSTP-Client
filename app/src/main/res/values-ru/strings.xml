@@ -227,7 +227,7 @@
     <string name="bypass_enable_support">Их адреса берутся из ответов DNS и исключаются из туннеля на лету</string>
     <string name="bypass_field">Домены</string>
     <string name="bypass_field_support">По одному в строке, поддомены включаются автоматически</string>
-    <string name="error_domains_invalid">Укажите домены вида ozon.ru, по одному в строке, без https:// и путей</string>
+    <string name="error_domains_invalid">Укажите домены вида example.com, по одному в строке, без https:// и путей</string>
     <string name="bypass_dns_hint">Работает, только если DNS идёт через туннель: выключите «Частный DNS» в настройках Android и «Безопасный DNS» в браузере. Нужен Android 13 или новее.</string>
     <string name="summary_bypass">мимо VPN: %1$d</string>
 </resources>

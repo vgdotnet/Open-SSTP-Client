@@ -111,7 +111,7 @@ private fun readName(data: ByteArray, position: Int, messageStart: Int, end: Int
     }
 }
 
-// "ozon.ru" matches ozon.ru and any subdomain; a leading "*." or "." in the rule is tolerated
+// "example.com" matches example.com and any subdomain; a leading "*." or "." in the rule is tolerated
 internal fun normalizeDomain(rule: String): String {
     return rule.trim().lowercase().removePrefix("*.").trimStart('.').trimEnd('.')
 }
