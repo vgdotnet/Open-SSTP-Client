@@ -302,7 +302,10 @@ internal fun IncomingManager.processIPPacket(isEnabledProtocol: Boolean, packetS
         val start = buffer.position() + 8
         val ipPacketSize = packetSize - 8
 
-        bridge.ipTerminal!!.writePacket(start, ipPacketSize, buffer)
+        val held = bridge.domainBypass?.intercept(buffer.array(), start, ipPacketSize) == true
+        if (!held) {
+            bridge.ipTerminal!!.writePacket(start, ipPacketSize, buffer)
+        }
         TrafficCounter.shared.addReceived(ipPacketSize)
     }
 

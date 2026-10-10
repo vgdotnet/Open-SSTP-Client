@@ -25,6 +25,7 @@ import kittoku.osc.preference.AUTH_PROTOCOl_PAP
 import kittoku.osc.preference.OscPrefKey
 import kittoku.osc.preference.accessor.getBooleanPrefValue
 import kittoku.osc.preference.accessor.getIntPrefValue
+import kittoku.osc.preference.bypassDomains
 import kittoku.osc.preference.accessor.markConnected
 import kittoku.osc.preference.accessor.markError
 import kittoku.osc.preference.accessor.resetReconnectionLife
@@ -80,6 +81,10 @@ internal class Controller(internal val bridge: SharedBridge) {
         jobMain = bridge.service.scope.launch(bridge.handler) {
             bridge.attachSSLTerminal()
             bridge.attachIPTerminal()
+            bypassDomains(bridge.prefs).takeIf { it.isNotEmpty() }?.also {
+                bridge.domainBypass = DomainBypass(bridge, it)
+                bridge.service.logWriter.report("Bypass domains: ${it.joinToString()}")
+            }
 
 
             bridge.sslTerminal!!.initialize()

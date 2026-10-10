@@ -1,6 +1,11 @@
 package kittoku.osc.preference
 
+import android.content.SharedPreferences
 import kittoku.osc.MAX_MRU
+import kittoku.osc.control.areValidDomains
+import kittoku.osc.control.normalizeDomains
+import kittoku.osc.preference.accessor.getBooleanPrefValue
+import kittoku.osc.preference.accessor.getStringPrefValue
 import kittoku.osc.MAX_MTU
 import kittoku.osc.MIN_MRU
 import kittoku.osc.MIN_MTU
@@ -11,6 +16,7 @@ internal enum class SettingsSection { ROUTES, APPS, ADVANCED }
 internal enum class SettingsError(val section: SettingsSection) {
     CUSTOM_ROUTES_INVALID(SettingsSection.ROUTES),
     CUSTOM_DNS_INVALID(SettingsSection.ROUTES),
+    BYPASS_DOMAINS_INVALID(SettingsSection.ROUTES),
     TLS_VERSION_REQUIRED(SettingsSection.ADVANCED),
     CERT_DIR_MISSING(SettingsSection.ADVANCED),
     SUITES_EMPTY(SettingsSection.ADVANCED),
@@ -87,6 +93,7 @@ internal fun sanitizeProfile(profile: Profile) {
     }
 
     profile.setString(OscPrefKey.ROUTE_CUSTOM_ROUTES, normalizeRoutes(profile.getString(OscPrefKey.ROUTE_CUSTOM_ROUTES)))
+    profile.setString(OscPrefKey.ROUTE_BYPASS_DOMAINS, normalizeDomains(profile.getString(OscPrefKey.ROUTE_BYPASS_DOMAINS)))
 
     listOf(
         OscPrefKey.DNS_CUSTOM_ADDRESS,
@@ -110,6 +117,10 @@ internal fun profileSettingsErrors(profile: Profile): Set<SettingsError> {
         check(
             getBoolean(OscPrefKey.DNS_DO_USE_CUSTOM_SERVER) && !isIpLiteral(getString(OscPrefKey.DNS_CUSTOM_ADDRESS).trim()),
             SettingsError.CUSTOM_DNS_INVALID,
+        )
+        check(
+            getBoolean(OscPrefKey.ROUTE_DO_BYPASS_DOMAINS) && !areValidDomains(getString(OscPrefKey.ROUTE_BYPASS_DOMAINS)),
+            SettingsError.BYPASS_DOMAINS_INVALID,
         )
 
         // the core builds SSLContext.getInstance(version) when custom certificates are used
@@ -159,4 +170,14 @@ internal fun pruneUninstalledApps(profile: Profile, isInstalled: (String) -> Boo
 
     profile.setSet(OscPrefKey.ROUTE_SELECTED_APPS, installed)
     return true
+}
+
+internal fun Profile.bypassDomains(): List<String> {
+    if (!getBoolean(OscPrefKey.ROUTE_DO_BYPASS_DOMAINS)) return emptyList()
+    return normalizeDomains(getString(OscPrefKey.ROUTE_BYPASS_DOMAINS)).lines().filter { it.isNotEmpty() }
+}
+
+internal fun bypassDomains(prefs: SharedPreferences): List<String> {
+    if (!getBooleanPrefValue(OscPrefKey.ROUTE_DO_BYPASS_DOMAINS, prefs)) return emptyList()
+    return normalizeDomains(getStringPrefValue(OscPrefKey.ROUTE_BYPASS_DOMAINS, prefs)).lines().filter { it.isNotEmpty() }
 }

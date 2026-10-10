@@ -9,6 +9,7 @@ import kittoku.osc.preference.accessor.getSetPrefValue
 import kittoku.osc.preference.accessor.getStringPrefValue
 import kittoku.osc.preference.getValidSelectedAppInfos
 import kittoku.osc.service.SstpVpnService
+import kittoku.osc.control.DomainBypass
 import kittoku.osc.terminal.IPTerminal
 import kittoku.osc.terminal.SSLTerminal
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -91,13 +92,13 @@ internal enum class Result {
 
 internal class SharedBridge(internal val service: SstpVpnService) {
     internal val prefs = PreferenceManager.getDefaultSharedPreferences(service)
-    internal val builder = service.Builder()
     internal lateinit var handler: CoroutineExceptionHandler
 
     internal val controlMailbox = Channel<ControlMessage>(Channel.BUFFERED)
 
     internal var sslTerminal: SSLTerminal? = null
     internal var ipTerminal: IPTerminal? = null
+    internal var domainBypass: DomainBypass? = null
 
     internal val HOME_USERNAME = getStringPrefValue(OscPrefKey.HOME_USERNAME, prefs)
     internal val HOME_PASSWORD = getStringPrefValue(OscPrefKey.HOME_PASSWORD, prefs)

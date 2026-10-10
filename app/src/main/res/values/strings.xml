@@ -221,4 +221,13 @@
     <string name="details_apps_except">all except selected: %1$d</string>
     <string name="edit_live_notice">This connection is active. Changes take effect after you reconnect.</string>
     <string name="saved_reconnect">Saved. Reconnect to apply the changes.</string>
+
+    <string name="bypass_header">Sites outside the VPN</string>
+    <string name="bypass_enable">Send selected sites around the VPN</string>
+    <string name="bypass_enable_support">Their addresses are taken from DNS answers and excluded from the tunnel on the fly</string>
+    <string name="bypass_field">Domains</string>
+    <string name="bypass_field_support">One per line; subdomains are included</string>
+    <string name="error_domains_invalid">Enter domain names like ozon.ru, one per line, without https:// or paths</string>
+    <string name="bypass_dns_hint">Works only when DNS goes through the tunnel: turn off Private DNS in Android settings and Secure DNS in the browser. Requires Android 13 or newer.</string>
+    <string name="summary_bypass">%1$d sites outside</string>
 </resources>

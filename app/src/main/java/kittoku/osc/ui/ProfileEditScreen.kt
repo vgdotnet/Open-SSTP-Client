@@ -44,6 +44,7 @@ import kittoku.osc.preference.Profile
 import kittoku.osc.preference.ProfileForm
 import kittoku.osc.preference.ProfileFormError
 import kittoku.osc.preference.SettingsSection
+import kittoku.osc.preference.bypassDomains
 import kittoku.osc.preference.getBoolean
 import kittoku.osc.preference.getSet
 import kittoku.osc.preference.getString
@@ -215,7 +216,10 @@ private fun routesSummary(profile: Profile): String {
         else -> stringResource(R.string.summary_dns_system)
     }
 
-    return stringResource(traffic) + " · " + dns
+    val bypass = profile.bypassDomains().size
+    val tail = if (bypass > 0) " · " + stringResource(R.string.summary_bypass, bypass) else ""
+
+    return stringResource(traffic) + " · " + dns + tail
 }
 
 @Composable

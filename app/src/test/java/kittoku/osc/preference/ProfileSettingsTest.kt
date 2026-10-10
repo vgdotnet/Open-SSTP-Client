@@ -153,5 +153,24 @@ class ProfileSettingsTest {
         assertEquals(setOf("com.chrome"), profile.getSet(OscPrefKey.ROUTE_SELECTED_APPS))
         assertFalse(pruneUninstalledApps(profile) { true })
     }
+
+    @Test
+    fun bypassDomainsAreValidatedAndNormalized() {
+        assertEquals(setOf(SettingsError.BYPASS_DOMAINS_INVALID), errorsOf { setBoolean(OscPrefKey.ROUTE_DO_BYPASS_DOMAINS, true) })
+        assertEquals(setOf(SettingsError.BYPASS_DOMAINS_INVALID), errorsOf {
+            setBoolean(OscPrefKey.ROUTE_DO_BYPASS_DOMAINS, true)
+            setString(OscPrefKey.ROUTE_BYPASS_DOMAINS, "https://ozon.ru/")
+        })
+
+        val profile = Profile().apply {
+            setBoolean(OscPrefKey.ROUTE_DO_BYPASS_DOMAINS, true)
+            setString(OscPrefKey.ROUTE_BYPASS_DOMAINS, " *.Ozon.ru \n\nsberbank.ru.\nozon.ru")
+        }
+        sanitizeProfile(profile)
+
+        assertTrue(profileSettingsErrors(profile).isEmpty())
+        assertEquals(listOf("ozon.ru", "sberbank.ru"), profile.bypassDomains())
+        assertTrue(Profile().bypassDomains().isEmpty())
+    }
 }
 
