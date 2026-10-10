@@ -127,4 +127,31 @@ class ProfileSettingsTest {
         assertFalse(getBooleanPrefValue(OscPrefKey.ROUTE_DO_ADD_DEFAULT_ROUTE, prefs))
         assertEquals("192.168.1.0/24", getStringPrefValue(OscPrefKey.ROUTE_CUSTOM_ROUTES, prefs))
     }
+
+    @Test
+    fun onlySelectedAppsNeedsAtLeastOneApp() {
+        // an empty allow-list makes Android route every app through the VPN
+        assertEquals(setOf(SettingsError.APPS_ONLY_EMPTY), errorsOf {
+            setBoolean(OscPrefKey.ROUTE_DO_ENABLE_APP_BASED_RULE, true)
+            setString(OscPrefKey.ROUTE_APP_LIST_TYPE, LIST_TYPE_ALLOWED)
+        })
+        assertTrue(errorsOf {
+            setBoolean(OscPrefKey.ROUTE_DO_ENABLE_APP_BASED_RULE, true)
+            setString(OscPrefKey.ROUTE_APP_LIST_TYPE, LIST_TYPE_DISALLOWED)
+        }.isEmpty())
+        assertTrue(errorsOf {
+            setBoolean(OscPrefKey.ROUTE_DO_ENABLE_APP_BASED_RULE, false)
+            setString(OscPrefKey.ROUTE_APP_LIST_TYPE, LIST_TYPE_ALLOWED)
+        }.isEmpty())
+    }
+
+    @Test
+    fun uninstalledAppsArePruned() {
+        val profile = Profile().apply { setSet(OscPrefKey.ROUTE_SELECTED_APPS, setOf("com.chrome", "org.gone")) }
+
+        assertTrue(pruneUninstalledApps(profile) { it == "com.chrome" })
+        assertEquals(setOf("com.chrome"), profile.getSet(OscPrefKey.ROUTE_SELECTED_APPS))
+        assertFalse(pruneUninstalledApps(profile) { true })
+    }
 }
+

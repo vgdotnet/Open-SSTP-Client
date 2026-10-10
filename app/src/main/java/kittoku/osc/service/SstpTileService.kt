@@ -14,6 +14,7 @@ import kittoku.osc.preference.OscPrefKey
 import kittoku.osc.preference.accessor.getBooleanPrefValue
 import kittoku.osc.preference.accessor.reconcileWithService
 import kittoku.osc.preference.connectionReadiness
+import kittoku.osc.preference.isInstalled
 import kittoku.osc.ui.AppActivity
 
 
@@ -100,7 +101,7 @@ internal class SstpTileService : TileService() {
     }
 
     override fun onClick() {
-        if (!rootState && (!isVpnPrepared || connectionReadiness(prefs) != null)) {
+        if (!rootState && (!isVpnPrepared || connectionReadiness(prefs) { packageManager.isInstalled(it) } != null)) {
             openApp()
             return
         }

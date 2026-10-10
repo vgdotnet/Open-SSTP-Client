@@ -214,4 +214,11 @@
     <string name="unit_kb">КБ</string>
     <string name="unit_mb">МБ</string>
     <string name="unit_gb">ГБ</string>
+
+    <string name="error_apps_only_empty">Отметьте хотя бы одно приложение или выберите «Все приложения»</string>
+    <string name="readiness_no_apps">Включён режим «Только выбранные», но ни одно отмеченное приложение не установлено. Откройте настройки подключения.</string>
+    <string name="details_apps_only">только выбранные: %1$d</string>
+    <string name="details_apps_except">все, кроме выбранных: %1$d</string>
+    <string name="edit_live_notice">Это подключение сейчас активно. Изменения вступят в силу после переподключения.</string>
+    <string name="saved_reconnect">Сохранено. Переподключитесь, чтобы изменения вступили в силу.</string>
 </resources>

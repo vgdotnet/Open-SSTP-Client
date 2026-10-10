@@ -14,9 +14,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -51,6 +54,7 @@ import kittoku.osc.preference.profileSettingsErrors
 @Composable
 internal fun ProfileEditScreen(
     draft: ProfileDraft,
+    isLive: Boolean,
     onFormChange: (ProfileForm) -> Unit,
     onOpenSection: (SettingsSection) -> Unit,
     onSave: () -> Unit,
@@ -101,6 +105,19 @@ internal fun ProfileEditScreen(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                if (isLive) {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(
+                            stringResource(R.string.edit_live_notice),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.padding(16.dp),
+                        )
+                    }
+                }
                 FormField(
                     value = name,
                     onValueChange = { name = it; push() },

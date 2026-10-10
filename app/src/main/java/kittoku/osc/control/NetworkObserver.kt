@@ -17,6 +17,10 @@ internal class NetworkObserver(val bridge: SharedBridge) {
     private val manager = bridge.service.getSystemService(ConnectivityManager::class.java)
     private val callback: ConnectivityManager.NetworkCallback
 
+    // read once: the settings may be edited while connected, the tunnel keeps the rule it was built with
+    private val doEnableAppBasedRule = getBooleanPrefValue(OscPrefKey.ROUTE_DO_ENABLE_APP_BASED_RULE, bridge.prefs)
+    private val appListType = getStringPrefValue(OscPrefKey.ROUTE_APP_LIST_TYPE, bridge.prefs)
+
     init {
         wipeStatus()
 
@@ -78,9 +82,8 @@ internal class NetworkObserver(val bridge: SharedBridge) {
         }
         summary.add("")
 
-        val doEnableAppBasedRule = getBooleanPrefValue(OscPrefKey.ROUTE_DO_ENABLE_APP_BASED_RULE, bridge.prefs)
         if (doEnableAppBasedRule) {
-            summary.add("[${getStringPrefValue(OscPrefKey.ROUTE_APP_LIST_TYPE, bridge.prefs)}]")
+            summary.add("[$appListType]")
             bridge.selectedApps.forEach { summary.add(it.label) }
         }
 

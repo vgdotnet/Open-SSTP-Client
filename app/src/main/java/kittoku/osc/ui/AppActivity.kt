@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -15,6 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import kittoku.osc.R
 import kittoku.osc.control.ConnectionLog
 import kittoku.osc.preference.Profile
 import kittoku.osc.preference.SettingsError
@@ -103,8 +105,10 @@ class AppActivity : ComponentActivity() {
                     }
                     composable(ROUTE_EDIT) {
                         rememberLastNonNull(currentDraft)?.also { draft ->
+                            val isLive = !canSwitch && draft.originalName != null && draft.originalName == profilesState.activeName
                             ProfileEditScreen(
                                 draft = draft,
+                                isLive = isLive,
                                 onFormChange = profilesViewModel::updateForm,
                                 onOpenSection = { section ->
                                     navController.navigate(
@@ -115,7 +119,12 @@ class AppActivity : ComponentActivity() {
                                         }
                                     )
                                 },
-                                onSave = { if (profilesViewModel.saveDraft()) navController.popBackStack() },
+                                onSave = {
+                                    if (profilesViewModel.saveDraft()) {
+                                        if (isLive) Toast.makeText(this@AppActivity, R.string.saved_reconnect, Toast.LENGTH_LONG).show()
+                                        navController.popBackStack()
+                                    }
+                                },
                                 onBack = {
                                     navController.popBackStack()
                                     profilesViewModel.discardDraft()
@@ -129,8 +138,8 @@ class AppActivity : ComponentActivity() {
                         }
                     }
                     composable(ROUTE_EDIT_APPS) {
-                        DraftSection(currentDraft) { profile, _ ->
-                            AppsSettingsScreen(profile, profilesViewModel::updateProfile, popBack)
+                        DraftSection(currentDraft) { profile, errors ->
+                            AppsSettingsScreen(profile, errors, profilesViewModel::updateProfile, popBack)
                         }
                     }
                     composable(ROUTE_EDIT_ADVANCED) {

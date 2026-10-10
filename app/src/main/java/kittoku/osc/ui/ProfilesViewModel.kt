@@ -17,7 +17,9 @@ import kittoku.osc.preference.applyTo
 import kittoku.osc.preference.deserializeProfile
 import kittoku.osc.preference.effectiveName
 import kittoku.osc.preference.profileFormOf
+import kittoku.osc.preference.isInstalled
 import kittoku.osc.preference.profileSettingsErrors
+import kittoku.osc.preference.pruneUninstalledApps
 import kittoku.osc.preference.sanitizeProfile
 import kittoku.osc.preference.validateProfileForm
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -95,6 +97,8 @@ internal class ProfilesViewModel(
         if (name != null && name == store.activeName) store.captureActive()
 
         val profile = name?.let { store.read(it) } ?: Profile()
+        val pm = getApplication<Application>().packageManager
+        pruneUninstalledApps(profile) { pm.isInstalled(it) }
         val form = if (name == null) ProfileForm() else profileFormOf(name, profile)
         setDraft(ProfileDraft(name, form, Json.encodeToString(profile)))
     }

@@ -19,6 +19,7 @@ import kittoku.osc.preference.accessor.reconcileWithService
 import kittoku.osc.preference.accessor.getStringPrefValue
 import kittoku.osc.preference.ReadinessError
 import kittoku.osc.preference.connectionReadiness
+import kittoku.osc.preference.isInstalled
 import kittoku.osc.service.ACTION_VPN_CONNECT
 import kittoku.osc.service.ACTION_VPN_DISCONNECT
 import kittoku.osc.service.SstpVpnService
@@ -94,7 +95,8 @@ internal class HomeViewModel(application: Application) : AndroidViewModel(applic
 
     // Returns why the active connection cannot be started, null when the service was started
     fun connect(): ReadinessError? {
-        connectionReadiness(prefs)?.also { return it }
+        val pm = getApplication<Application>().packageManager
+        connectionReadiness(prefs) { pm.isInstalled(it) }?.also { return it }
         startService(ACTION_VPN_CONNECT)
         return null
     }

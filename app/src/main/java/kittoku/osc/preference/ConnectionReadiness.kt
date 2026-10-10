@@ -5,13 +5,19 @@ import android.content.SharedPreferences
 
 internal enum class ReadinessError {
     NO_SERVER,
+    NO_APPS_SELECTED,
     INVALID_SETTINGS,
 }
 
 // Checked right before the VPN service is started, from the app and from the quick settings tile
-internal fun connectionReadiness(prefs: SharedPreferences): ReadinessError? {
+internal fun connectionReadiness(prefs: SharedPreferences, isInstalled: (String) -> Boolean): ReadinessError? {
     val profile = deserializeProfile(serializeProfile(prefs)) ?: return ReadinessError.INVALID_SETTINGS
     if (profile.getString(OscPrefKey.HOME_HOSTNAME).isBlank()) return ReadinessError.NO_SERVER
+
+    // the core silently skips uninstalled apps, which would leave an empty allow-list and a full-device VPN
+    if (profile.isOnlySelectedApps() && profile.getSet(OscPrefKey.ROUTE_SELECTED_APPS).none(isInstalled)) {
+        return ReadinessError.NO_APPS_SELECTED
+    }
 
     // the copy is sanitized like the editor does, so values of switched-off features do not count
     sanitizeProfile(profile)

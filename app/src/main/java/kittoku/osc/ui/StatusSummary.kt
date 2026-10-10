@@ -1,5 +1,8 @@
 package kittoku.osc.ui
 
+import kittoku.osc.preference.LIST_TYPE_ALLOWED
+import kittoku.osc.preference.LIST_TYPE_DISALLOWED
+
 
 internal data class StatusSummary(
     val tlsProtocol: String?,
@@ -51,3 +54,12 @@ internal fun parseStatusSummary(text: String): StatusSummary? {
         apps = appSection?.let { sections[it] }.orEmpty(),
     )
 }
+
+internal enum class AppRule { ONLY, EXCEPT }
+
+internal val StatusSummary.appRule: AppRule?
+    get() = when (appListType) {
+        LIST_TYPE_ALLOWED -> AppRule.ONLY
+        LIST_TYPE_DISALLOWED -> AppRule.EXCEPT
+        else -> null
+    }

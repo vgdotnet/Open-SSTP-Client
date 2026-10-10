@@ -41,3 +41,12 @@ internal fun getValidSelectedAppInfos(prefs: SharedPreferences, pm: PackageManag
         }
     }
 }
+
+internal fun PackageManager.isInstalled(packageName: String): Boolean {
+    return try {
+        getApplicationInfo(packageName, 0)
+        true
+    } catch (_: PackageManager.NameNotFoundException) {
+        false
+    }
+}

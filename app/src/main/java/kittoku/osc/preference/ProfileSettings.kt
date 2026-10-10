@@ -26,6 +26,7 @@ internal enum class SettingsError(val section: SettingsSection) {
     RECONNECTION_COUNT_INVALID(SettingsSection.ADVANCED),
     RECONNECTION_INTERVAL_INVALID(SettingsSection.ADVANCED),
     LOG_DIR_MISSING(SettingsSection.ADVANCED),
+    APPS_ONLY_EMPTY(SettingsSection.APPS),
 }
 
 internal val PORT_RANGE = 1..65535
@@ -139,7 +140,23 @@ internal fun profileSettingsErrors(profile: Profile): Set<SettingsError> {
         check(getInt(OscPrefKey.RECONNECTION_COUNT) !in RECONNECTION_COUNT_RANGE, SettingsError.RECONNECTION_COUNT_INVALID)
         check(getInt(OscPrefKey.RECONNECTION_INTERVAL) !in RECONNECTION_INTERVAL_RANGE, SettingsError.RECONNECTION_INTERVAL_INVALID)
         check(getBoolean(OscPrefKey.LOG_DO_SAVE_LOG) && getUri(OscPrefKey.LOG_DIR).isEmpty(), SettingsError.LOG_DIR_MISSING)
+
+        // Android routes every app through the VPN when no allowed app is given, the opposite of "only selected"
+        check(isOnlySelectedApps() && getSet(OscPrefKey.ROUTE_SELECTED_APPS).isEmpty(), SettingsError.APPS_ONLY_EMPTY)
     }
 
     return errors
+}
+
+internal fun Profile.isOnlySelectedApps(): Boolean =
+    getBoolean(OscPrefKey.ROUTE_DO_ENABLE_APP_BASED_RULE) && getString(OscPrefKey.ROUTE_APP_LIST_TYPE) == LIST_TYPE_ALLOWED
+
+// Returns true when something was removed
+internal fun pruneUninstalledApps(profile: Profile, isInstalled: (String) -> Boolean): Boolean {
+    val selected = profile.getSet(OscPrefKey.ROUTE_SELECTED_APPS)
+    val installed = selected.filter(isInstalled).toSet()
+    if (installed.size == selected.size) return false
+
+    profile.setSet(OscPrefKey.ROUTE_SELECTED_APPS, installed)
+    return true
 }

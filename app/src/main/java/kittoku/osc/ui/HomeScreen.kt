@@ -406,7 +406,11 @@ private fun DetailsTable(status: StatusSummary) {
         status.routes.isEmpty() -> stringResource(R.string.details_none)
         else -> stringResource(R.string.details_route_custom, status.routes.size)
     }
-    val apps = status.appListType?.let { "$it: ${status.apps.size}" } ?: stringResource(R.string.details_apps_all)
+    val apps = when (status.appRule) {
+        AppRule.ONLY -> stringResource(R.string.details_apps_only, status.apps.size)
+        AppRule.EXCEPT -> stringResource(R.string.details_apps_except, status.apps.size)
+        null -> stringResource(R.string.details_apps_all)
+    }
 
     Column(modifier = Modifier.padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         DetailsRow(stringResource(R.string.details_tls), tls.ifEmpty { stringResource(R.string.details_none) })
@@ -450,6 +454,7 @@ private fun MainButton(state: ConnectionState, onConnect: () -> Unit, onDisconne
 
 private fun ReadinessError.messageRes() = when (this) {
     ReadinessError.NO_SERVER -> R.string.readiness_no_server
+    ReadinessError.NO_APPS_SELECTED -> R.string.readiness_no_apps
     ReadinessError.INVALID_SETTINGS -> R.string.readiness_invalid
 }
 

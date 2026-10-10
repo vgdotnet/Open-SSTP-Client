@@ -214,4 +214,11 @@
     <string name="unit_kb">KB</string>
     <string name="unit_mb">MB</string>
     <string name="unit_gb">GB</string>
+
+    <string name="error_apps_only_empty">Select at least one app, or choose All apps</string>
+    <string name="readiness_no_apps">Only selected apps is on, but none of the selected apps is installed. Open the connection settings.</string>
+    <string name="details_apps_only">only selected: %1$d</string>
+    <string name="details_apps_except">all except selected: %1$d</string>
+    <string name="edit_live_notice">This connection is active. Changes take effect after you reconnect.</string>
+    <string name="saved_reconnect">Saved. Reconnect to apply the changes.</string>
 </resources>

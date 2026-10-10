@@ -60,4 +60,12 @@ class StatusSummaryTest {
         assertEquals(listOf("Gmail", "Chrome"), summary.apps)
         assertFalse(summary.hasDefaultRoute)
     }
+
+    @Test
+    fun appRuleIsRecognizedFromTheCoreSectionName() {
+        assertEquals(AppRule.ONLY, parseStatusSummary("[Allowed Apps]\nGmail\n")!!.appRule)
+        assertEquals(AppRule.EXCEPT, parseStatusSummary("[Disallowed Apps]\nGmail\n")!!.appRule)
+        assertNull(parseStatusSummary(keeneticStatus)!!.appRule)
+    }
 }
+

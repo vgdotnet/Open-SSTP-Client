@@ -46,6 +46,7 @@ import kittoku.osc.preference.LIST_TYPE_ALLOWED
 import kittoku.osc.preference.LIST_TYPE_DISALLOWED
 import kittoku.osc.preference.OscPrefKey
 import kittoku.osc.preference.Profile
+import kittoku.osc.preference.SettingsError
 import kittoku.osc.preference.getBoolean
 import kittoku.osc.preference.getInstalledAppInfos
 import kittoku.osc.preference.getSet
@@ -63,7 +64,7 @@ private data class AppItem(val packageName: String, val label: String, val info:
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun AppsSettingsScreen(profile: Profile, onEdit: ProfileEditor, onBack: () -> Unit) {
+internal fun AppsSettingsScreen(profile: Profile, errors: Set<SettingsError>, onEdit: ProfileEditor, onBack: () -> Unit) {
     val context = LocalContext.current
     val pm = context.packageManager
 
@@ -106,6 +107,7 @@ internal fun AppsSettingsScreen(profile: Profile, onEdit: ProfileEditor, onBack:
                 ModeRow(mode == AppsMode.ALL, R.string.apps_mode_all, R.string.apps_mode_all_support) { setMode(AppsMode.ALL) }
                 ModeRow(mode == AppsMode.ONLY, R.string.apps_mode_only, R.string.apps_mode_only_support) { setMode(AppsMode.ONLY) }
                 ModeRow(mode == AppsMode.EXCEPT, R.string.apps_mode_except, R.string.apps_mode_except_support) { setMode(AppsMode.EXCEPT) }
+                if (SettingsError.APPS_ONLY_EMPTY in errors) ErrorText(stringResource(R.string.error_apps_only_empty))
             }
 
             if (mode == AppsMode.ONLY && !profile.getBoolean(OscPrefKey.ROUTE_DO_ADD_DEFAULT_ROUTE)) {
