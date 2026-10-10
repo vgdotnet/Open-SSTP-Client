@@ -234,10 +234,18 @@ internal class SstpVpnService : VpnService() {
             it.setOngoing(true)
             it.setAutoCancel(true)
             it.setSmallIcon(R.drawable.ic_baseline_vpn_lock_24)
+            it.setContentIntent(openAppIntent())
             it.addAction(R.drawable.ic_baseline_close_24, "DISCONNECT", pendingIntent)
         }
 
         startForeground(NOTIFICATION_DISCONNECT_ID, builder.build())
+    }
+
+    // behaves like the launcher icon: brings the existing task to the front instead of stacking a new screen
+    private fun openAppIntent(): PendingIntent? {
+        val intent = packageManager.getLaunchIntentForPackage(packageName) ?: return null
+
+        return PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
     internal fun notifyMessage(message: String, id: Int, channel: String) {
@@ -246,6 +254,7 @@ internal class SstpVpnService : VpnService() {
             it.setContentText(message)
             it.priority = NotificationCompat.PRIORITY_DEFAULT
             it.setAutoCancel(true)
+            it.setContentIntent(openAppIntent())
 
             tryNotify(it.build(), id)
         }
