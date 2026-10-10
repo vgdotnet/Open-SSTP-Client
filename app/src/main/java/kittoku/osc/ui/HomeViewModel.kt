@@ -15,6 +15,7 @@ import kittoku.osc.preference.OscPrefKey
 import kittoku.osc.preference.PROFILE_KEY_HEADER
 import kittoku.osc.preference.ProfileStore
 import kittoku.osc.preference.accessor.getConnectionState
+import kittoku.osc.preference.accessor.reconcileWithService
 import kittoku.osc.preference.accessor.getStringPrefValue
 import kittoku.osc.preference.ReadinessError
 import kittoku.osc.preference.connectionReadiness
@@ -53,6 +54,10 @@ private val OBSERVED_KEYS = setOf(
 internal class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(application)
     private val profiles = ProfileStore(prefs)
+
+    init {
+        reconcileWithService(SstpVpnService.isRunning, prefs)
+    }
 
     val uiState: StateFlow<HomeUiState> = prefs
         .changes { it in OBSERVED_KEYS || it == ACTIVE_PROFILE_KEY || it.startsWith(PROFILE_KEY_HEADER) }

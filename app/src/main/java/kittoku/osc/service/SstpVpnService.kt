@@ -88,6 +88,7 @@ internal class SstpVpnService : VpnService() {
     }
 
     override fun onCreate() {
+        isRunning = true
         notificationManager = NotificationManagerCompat.from(this)
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this)
@@ -274,6 +275,7 @@ internal class SstpVpnService : VpnService() {
     }
 
     override fun onDestroy() {
+        isRunning = false
         logWriter.write("Terminate VPN connection")
         logWriter.close()
 
@@ -285,5 +287,11 @@ internal class SstpVpnService : VpnService() {
         setRootState(false)
         markDisconnectedUnlessError(prefs)
         prefs.unregisterOnSharedPreferenceChangeListener(listener)
+    }
+
+    companion object {
+        // lives in the process, so it is false after the process was killed even if the stored state says otherwise
+        @Volatile
+        internal var isRunning = false
     }
 }

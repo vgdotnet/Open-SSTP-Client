@@ -40,3 +40,19 @@ internal fun markDisconnectedUnlessError(prefs: SharedPreferences) {
         markDisconnected(prefs)
     }
 }
+
+// The state is persisted, the service is not: after the process was killed (update, low memory)
+// a "connected" state would stay forever. Called whenever the UI or the tile comes up.
+internal fun reconcileWithService(isServiceRunning: Boolean, prefs: SharedPreferences) {
+    if (isServiceRunning) return
+
+    val state = getConnectionState(prefs)
+    if (state == CONNECTION_STATE_CONNECTING || state == CONNECTION_STATE_CONNECTED) {
+        setStringPrefValue("", OscPrefKey.HOME_STATUS, prefs)
+        markDisconnected(prefs)
+    }
+
+    if (getBooleanPrefValue(OscPrefKey.ROOT_STATE, prefs)) {
+        setBooleanPrefValue(false, OscPrefKey.ROOT_STATE, prefs)
+    }
+}

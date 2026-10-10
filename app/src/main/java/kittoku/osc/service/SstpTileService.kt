@@ -12,6 +12,7 @@ import androidx.annotation.RequiresApi
 import androidx.preference.PreferenceManager
 import kittoku.osc.preference.OscPrefKey
 import kittoku.osc.preference.accessor.getBooleanPrefValue
+import kittoku.osc.preference.accessor.reconcileWithService
 import kittoku.osc.preference.connectionReadiness
 import kittoku.osc.ui.AppActivity
 
@@ -67,6 +68,7 @@ internal class SstpTileService : TileService() {
     }
 
     override fun onStartListening() {
+        reconcileWithService(SstpVpnService.isRunning, prefs)
         initializeState()
 
         prefs.registerOnSharedPreferenceChangeListener(listener)
