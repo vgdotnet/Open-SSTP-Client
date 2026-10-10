@@ -21,6 +21,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.ArrowDownward
+import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.LockOpen
@@ -55,6 +57,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -69,6 +72,7 @@ import kotlinx.coroutines.delay
 @Composable
 internal fun HomeScreen(
     uiState: HomeUiState,
+    traffic: TrafficSnapshot,
     onConnect: () -> ReadinessError?,
     onDisconnect: () -> Unit,
     onOpenDetails: () -> Unit,
@@ -143,6 +147,11 @@ internal fun HomeScreen(
                 ConnectionState.CONNECTED -> ConnectedCaption(uiState)
                 ConnectionState.ERROR -> ErrorCard(uiState.errorCode, onOpenLog)
                 else -> {}
+            }
+
+            if (uiState.state == ConnectionState.CONNECTED) {
+                Spacer(Modifier.height(16.dp))
+                TrafficPanel(traffic)
             }
 
             if (uiState.state == ConnectionState.CONNECTED && uiState.status != null) {
@@ -443,3 +452,62 @@ private fun ReadinessError.messageRes() = when (this) {
     ReadinessError.NO_SERVER -> R.string.readiness_no_server
     ReadinessError.INVALID_SETTINGS -> R.string.readiness_invalid
 }
+
+@Composable
+private fun TrafficPanel(traffic: TrafficSnapshot) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        TrafficColumn(
+            icon = Icons.Outlined.ArrowDownward,
+            description = R.string.traffic_download,
+            rate = traffic.receiveRate,
+            total = traffic.receivedBytes,
+            totalLabel = R.string.traffic_received,
+            modifier = Modifier.weight(1f),
+        )
+        TrafficColumn(
+            icon = Icons.Outlined.ArrowUpward,
+            description = R.string.traffic_upload,
+            rate = traffic.sendRate,
+            total = traffic.sentBytes,
+            totalLabel = R.string.traffic_sent,
+            modifier = Modifier.weight(1f),
+        )
+    }
+}
+
+@Composable
+private fun TrafficColumn(
+    icon: ImageVector,
+    description: Int,
+    rate: Long,
+    total: Long,
+    totalLabel: Int,
+    modifier: Modifier,
+) {
+    Row(modifier = modifier, horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+        Icon(icon, contentDescription = stringResource(description), tint = MaterialTheme.colorScheme.primary)
+        Spacer(Modifier.size(8.dp))
+        Column {
+            Text(stringResource(R.string.traffic_rate, sizeText(rate)), style = MaterialTheme.typography.titleMedium)
+            Text(
+                stringResource(totalLabel, sizeText(total)),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun sizeText(bytes: Long): String {
+    val locale = LocalConfiguration.current.locales[0]
+    val size = formatSize(bytes, locale)
+    val unit = when (size.unit) {
+        SizeUnit.B -> R.string.unit_b
+        SizeUnit.KB -> R.string.unit_kb
+        SizeUnit.MB -> R.string.unit_mb
+        SizeUnit.GB -> R.string.unit_gb
+    }
+    return size.number + "\u00A0" + stringResource(unit)
+}
+

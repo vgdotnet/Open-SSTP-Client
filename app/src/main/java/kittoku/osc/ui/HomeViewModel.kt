@@ -21,8 +21,12 @@ import kittoku.osc.preference.connectionReadiness
 import kittoku.osc.service.ACTION_VPN_CONNECT
 import kittoku.osc.service.ACTION_VPN_DISCONNECT
 import kittoku.osc.service.SstpVpnService
+import android.os.SystemClock
+import kittoku.osc.control.TrafficCounter
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
@@ -54,6 +58,15 @@ internal class HomeViewModel(application: Application) : AndroidViewModel(applic
         .changes { it in OBSERVED_KEYS || it == ACTIVE_PROFILE_KEY || it.startsWith(PROFILE_KEY_HEADER) }
         .map { readState() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), readState())
+
+    val traffic: StateFlow<TrafficSnapshot> = flow {
+        val sampler = TrafficSampler()
+        val counter = TrafficCounter.shared
+        while (true) {
+            emit(sampler.sample(SystemClock.elapsedRealtime(), counter.receivedBytes, counter.sentBytes))
+            delay(1_000)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(1_000), TrafficSnapshot.ZERO)
 
     private fun readState(): HomeUiState {
         val rawStatus = getStringPrefValue(OscPrefKey.HOME_STATUS, prefs)

@@ -22,6 +22,7 @@ import kittoku.osc.SharedBridge
 import kittoku.osc.control.ConnectionLog
 import kittoku.osc.control.Controller
 import kittoku.osc.control.LogWriter
+import kittoku.osc.control.TrafficCounter
 import kittoku.osc.preference.OscPrefKey
 import kittoku.osc.preference.accessor.getBooleanPrefValue
 import kittoku.osc.preference.accessor.getIntPrefValue
@@ -114,6 +115,7 @@ internal class SstpVpnService : VpnService() {
                 resetReconnectionLife(prefs)
                 markConnecting(prefs)
                 ConnectionLog.shared.clear()
+                TrafficCounter.shared.reset()
                 logWriter.close()
                 logWriter = LogWriter(ConnectionLog.shared, if (getBooleanPrefValue(OscPrefKey.LOG_DO_SAVE_LOG, prefs)) openLogFile() else null)
 

@@ -64,8 +64,10 @@ class AppActivity : ComponentActivity() {
 
                 NavHost(navController = navController, startDestination = ROUTE_HOME) {
                     composable(ROUTE_HOME) {
+                        val traffic by homeViewModel.traffic.collectAsStateWithLifecycle()
                         HomeScreen(
                             uiState = homeState,
+                            traffic = traffic,
                             onConnect = homeViewModel::connect,
                             onDisconnect = homeViewModel::disconnect,
                             onOpenDetails = { navController.navigate(ROUTE_DETAILS) },

@@ -4,6 +4,7 @@ import kittoku.osc.ControlMessage
 import kittoku.osc.Result
 import kittoku.osc.SharedBridge
 import kittoku.osc.Where
+import kittoku.osc.control.TrafficCounter
 import kittoku.osc.unit.ppp.PPP_HDLC_HEADER
 import kittoku.osc.unit.ppp.PPP_PROTOCOL_IP
 import kittoku.osc.unit.ppp.PPP_PROTOCOL_IPv6
@@ -94,6 +95,8 @@ internal class OutgoingManager(private val bridge: SharedBridge) {
                 return false
             }
         }
+
+        TrafficCounter.shared.addSent(packet.remaining())
 
         mainBuffer.putShort(SSTP_PACKET_TYPE_DATA)
         mainBuffer.putShort((packet.remaining() + PREFIX_SIZE).toShort())

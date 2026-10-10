@@ -75,6 +75,7 @@ import kittoku.osc.unit.sstp.SstpCallDisconnect
 import kittoku.osc.unit.sstp.SstpCallDisconnectAck
 import kittoku.osc.unit.sstp.SstpEchoRequest
 import kittoku.osc.unit.sstp.SstpEchoResponse
+import kittoku.osc.control.TrafficCounter
 import java.nio.ByteBuffer
 
 
@@ -302,6 +303,7 @@ internal fun IncomingManager.processIPPacket(isEnabledProtocol: Boolean, packetS
         val ipPacketSize = packetSize - 8
 
         bridge.ipTerminal!!.writePacket(start, ipPacketSize, buffer)
+        TrafficCounter.shared.addReceived(ipPacketSize)
     }
 
     buffer.move(packetSize)

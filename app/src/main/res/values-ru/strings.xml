@@ -204,4 +204,14 @@
     <string name="about_thanks_text">Это приложение существует благодаря KOBAYASHI Ittoku, который написал Open SSTP Client и открыл его код под лицензией MIT. Всё, на чём держится подключение, SSTP, PPP, TLS и аутентификация, — его работа. Эта версия только добавляет поверх неё новый интерфейс.</string>
     <string name="about_contributors">Участники оригинального проекта</string>
     <string name="about_links">Ссылки</string>
+
+    <string name="traffic_download">Загрузка</string>
+    <string name="traffic_upload">Отдача</string>
+    <string name="traffic_rate">%1$s/с</string>
+    <string name="traffic_received">принято %1$s</string>
+    <string name="traffic_sent">отправлено %1$s</string>
+    <string name="unit_b">Б</string>
+    <string name="unit_kb">КБ</string>
+    <string name="unit_mb">МБ</string>
+    <string name="unit_gb">ГБ</string>
 </resources>
